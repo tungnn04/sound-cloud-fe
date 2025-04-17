@@ -1,0 +1,103 @@
+package com.example.app.ui.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.app.R
+import com.example.app.model.Song
+
+@Composable
+fun SongItem(
+     song: Song,
+     onMoreOptionClick: (Song) -> Unit,
+     onPlayClick: (Int) -> Unit,
+) {
+    Row(
+         verticalAlignment = Alignment.CenterVertically,
+         horizontalArrangement = Arrangement.SpaceBetween,
+         modifier = Modifier.fillMaxWidth()
+    ) {
+          Row {
+               AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                         .data(song.coverUrl)
+                         .crossfade(true)
+                         .build(),
+                    contentDescription = "Song cover",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(80.dp)
+                         .clip(RoundedCornerShape(12.dp))
+               )
+               Column(
+                    modifier = Modifier.padding(start = 16.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+               ) {
+                    Text(
+                         text = song.title,
+                         style = TextStyle(color = Color.White, fontSize = 14.sp),
+                         modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Text(
+                         text = song.artistName ?: "Unknown artist",
+                         style = TextStyle(color = Color.Gray, fontSize = 12.sp)
+                    )
+               }
+          }
+
+         Row {
+              IconButton(onClick = {onPlayClick(song.id)}) {
+                   Icon(
+                        painterResource(id = R.drawable.ic_play_circle),
+                        contentDescription = "Play song",
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                   )
+              }
+              IconButton(onClick = { onMoreOptionClick(song) }) {
+                   Icon(
+                        painterResource(id = R.drawable.ic_dots_vertical),
+                        contentDescription = "More options",
+                        tint = Color.White
+                   )
+              }
+         }
+    }
+}
+
+@Composable
+fun ListSong(
+     listSong: List<Song>,
+     onMoreOptionClick: (Song) -> Unit,
+     onPlayClick: (Int) -> Unit,
+){
+     LazyColumn(
+          modifier = Modifier.fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(8.dp)
+     ) {
+          items(listSong.size) { index ->
+               SongItem(listSong[index], onPlayClick = onPlayClick, onMoreOptionClick = onMoreOptionClick )
+          }
+     }
+}
