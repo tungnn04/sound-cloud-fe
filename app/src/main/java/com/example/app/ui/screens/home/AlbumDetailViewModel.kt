@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class AlbumDetailViewModel(
     private val albumRepository: AlbumRepository,
-    playlistRepository: PlaylistRepository,
+    private val playlistRepository: PlaylistRepository,
     favoriteRepository: FavoriteRepository
 ): BaseViewModel(playlistRepository, favoriteRepository) {
     private val _uiState = MutableStateFlow(AlbumDetailUiState())
@@ -28,6 +28,10 @@ class AlbumDetailViewModel(
         if (response.isSuccessful) {
             _uiState.value = _uiState.value.copy(isLoading = false)
             _uiState.value = _uiState.value.copy(album = response.body()?.data)
+        }
+        val res = playlistRepository.findAll();
+        if (res.isSuccessful) {
+            _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
     }
 

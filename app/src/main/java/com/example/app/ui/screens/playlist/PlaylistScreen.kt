@@ -249,7 +249,7 @@ private fun PlayListItem(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(playList.coverUrl)
+                    .data(playList.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
                     .crossfade(true)
                     .build(),
                 contentDescription = "Playlist cover",

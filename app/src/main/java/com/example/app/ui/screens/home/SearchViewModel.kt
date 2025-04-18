@@ -25,7 +25,7 @@ class SearchViewModel(
     private val songRepository: SongRepository,
     private val artistRepository: ArtistRepository,
     private val albumRepository: AlbumRepository,
-    playlistRepository: PlaylistRepository,
+    private val playlistRepository: PlaylistRepository,
     favoriteRepository: FavoriteRepository
 ): BaseViewModel(playlistRepository, favoriteRepository) {
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -49,11 +49,14 @@ class SearchViewModel(
             SearchCategory.SONGS -> {
                 val response = songRepository.search(0, 10, SearchSong(title = searchText))
                 if (response.isSuccessful) {
-                    loadAllPlaylists()
                     _uiState.value = _uiState.value.copy(listSong = response.body()?.data ?: emptyList())
                     _uiState.value = _uiState.value.copy(isLoading = false)
-                    _uiState.value = _uiState.value.copy(playlists = playlists.value)
                 }
+                val res = playlistRepository.findAll();
+                if (res.isSuccessful) {
+                    _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
+                }
+
             }
             SearchCategory.ARTISTS -> {
                 val response = artistRepository.search(0, 10, SearchArtist(name = searchText))

@@ -75,7 +75,6 @@ class MusicPlayerViewModel(
 
     init {
         setupPlayerListener()
-        Log.d("MusicPlayerVM_Listener", "set Up")
     }
 
     private fun setupPlayerListener() {
@@ -213,9 +212,10 @@ class MusicPlayerViewModel(
             _uiState.update { it.copy(playlist = listOf(song)) }
             newMediaItem?.let { exoPlayer.setMediaItem(it) }
             exoPlayer.playWhenReady = true
+            Log.d("MusicPlayerVM", "Calling prepare() for new playlist.")
             exoPlayer.prepare()
+            Log.d("MusicPlayerVM", "Called prepare() for new playlist.")
             exoPlayer.play()
-            Log.d("MusicPlayerVM", "Song not found in current queue. Setting as new playlist.")
         }
 
         _uiState.update { it.copy(currentSong = song) }

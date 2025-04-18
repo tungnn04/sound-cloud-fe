@@ -82,7 +82,7 @@ fun PlaylistOption(
                     ) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(playlist?.coverUrl)
+                                .data(playlist?.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
                                 .crossfade(true)
                                 .build(),
                             contentDescription = "Playlist Cover",
@@ -302,7 +302,6 @@ fun AddPlaylist(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-
     if (showAddPlaylist) {
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
@@ -329,7 +328,7 @@ fun AddPlaylist(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton ( onClick = onCreatePlaylist, modifier = Modifier.size(80.dp)) {
+                        IconButton ( onClick = onCreatePlaylist, modifier = Modifier.size(40.dp)) {
                             Icon(
                                 painterResource(id = R.drawable.ic_add_circle),
                                 contentDescription = "Add playlist",
@@ -351,19 +350,21 @@ fun AddPlaylist(
                                     .fillMaxWidth()
                                     .clickable {
                                         onAddToPlaylist(songId, playlist.id)
+                                        onDismissClick()
+                                        Toast.makeText(context, "Added to ${playlist.name}", Toast.LENGTH_SHORT).show()
                                     },
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(playlist.coverUrl)
+                                        .data(playlist.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
                                         .crossfade(true)
                                         .build(),
                                     contentDescription = "Playlist Cover",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(80.dp)
+                                        .size(40.dp)
                                         .clip(RoundedCornerShape(12.dp))
                                 )
                                 Spacer(Modifier.height(16.dp))
@@ -439,11 +440,18 @@ fun CreatePlaylist(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AppButton("Cancel", onClick =  onDone , style = ButtonStyle.SECONDARY)
+                        AppButton("Cancel",
+                            onClick = {
+                                onDone()
+                                playlistName = ""
+                            },
+                            style = ButtonStyle.SECONDARY
+                        )
                         AppButton("Create" ,
                             onClick = {
                                 onDone()
                                 onCreatePlaylist(playlistName)
+                                playlistName = ""
                             },
                             style = ButtonStyle.PRIMARY)
                     }

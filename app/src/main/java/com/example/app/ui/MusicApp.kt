@@ -130,7 +130,10 @@ fun MusicApp() {
                     if (uiState.currentSong != null) {
                         MiniPlayerBar(
                             uiState = uiState,
-                            onPlayPauseClick = { musicPlayerViewModel.playPause() },
+                            onPlayPauseClick = {
+                                musicPlayerViewModel.playPause()
+                                Log.e("PlayPause", uiState.isPlaying.toString())
+                                               },
                             onNextClick = { musicPlayerViewModel.seekToNext() },
                             onBarClick = {
                                 isPlayerScreenVisible = true

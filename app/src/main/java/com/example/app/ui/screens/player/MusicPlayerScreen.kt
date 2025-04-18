@@ -124,17 +124,13 @@ fun MusicPlayerScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (uiState.isLoading) {
-                CircularProgressIndicator(color = Color.White)
-            } else {
-                PlayerControls(
-                    modifier = Modifier.fillMaxWidth(),
-                    isPlaying = uiState.isPlaying,
-                    onPlayPauseClick = { musicPlayerViewModel.playPause() },
-                    onNextClick = { musicPlayerViewModel.seekToNext() },
-                    onPreviousClick = { musicPlayerViewModel.seekToPrevious() }
-                )
-            }
+            PlayerControls(
+                modifier = Modifier.fillMaxWidth(),
+                isPlaying = uiState.isPlaying,
+                onPlayPauseClick = { musicPlayerViewModel.playPause() },
+                onNextClick = { musicPlayerViewModel.seekToNext() },
+                onPreviousClick = { musicPlayerViewModel.seekToPrevious() }
+            )
         }
     }
 }

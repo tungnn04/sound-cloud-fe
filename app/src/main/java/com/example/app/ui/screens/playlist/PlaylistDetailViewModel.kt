@@ -22,11 +22,13 @@ class PlaylistDetailViewModel(
     suspend fun fetchData(id: Int) {
         _uiState.value = PlaylistDetailUiState(isLoading = true)
         val response = playlistRepository.detail(id)
-        loadAllPlaylists()
         if (response.isSuccessful) {
             _uiState.value = _uiState.value.copy(isLoading = false)
             _uiState.value = _uiState.value.copy(playlist = response.body()?.data)
-            _uiState.value = _uiState.value.copy(playlists = playlists.value)
+        }
+        val res = playlistRepository.findAll();
+        if (res.isSuccessful) {
+            _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
     }
 
@@ -39,7 +41,6 @@ class PlaylistDetailViewModel(
 
     suspend fun deletePlaylist(id: Int) {
         val response = playlistRepository.deletePlaylist(id)
-        loadAllPlaylists()
     }
 
     companion object {

@@ -7,7 +7,7 @@ data class PlayList(
     val id: Int,
     val name: String,
     val userId: Int,
-    val coverUrl: String,
+    val coverUrl: String ?= null,
     val songs: List<Song> ?= null
 )
 

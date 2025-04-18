@@ -159,7 +159,7 @@ fun PlaylistDetailScreen(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.playlist?.coverUrl)
+                    .data(uiState.playlist?.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
                     .crossfade(true)
                     .build(),
                 contentDescription = uiState.playlist?.name,

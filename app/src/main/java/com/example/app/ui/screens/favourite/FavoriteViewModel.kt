@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class FavoriteViewModel(
     private val favoriteRepository: FavoriteRepository,
-    playlistRepository: PlaylistRepository,
+    private val playlistRepository: PlaylistRepository,
 ): BaseViewModel(playlistRepository, favoriteRepository) {
     private val _uiState = MutableStateFlow(FavoriteUiState())
     val uiState = _uiState.asStateFlow()
@@ -24,10 +24,12 @@ class FavoriteViewModel(
         _uiState.value = _uiState.value.copy(isLoading = true)
         val response = favoriteRepository.fillAll()
         if (response.isSuccessful) {
-            loadAllPlaylists()
-            _uiState.value = _uiState.value.copy(playlists = playlists.value)
             _uiState.value = _uiState.value.copy(isLoading = false)
             _uiState.value = _uiState.value.copy(songs = response.body()?.data ?: emptyList())
+        }
+        val res = playlistRepository.findAll();
+        if (res.isSuccessful) {
+            _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
     }
 
