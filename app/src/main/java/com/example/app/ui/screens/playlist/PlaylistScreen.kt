@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -66,6 +67,7 @@ import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.CreatePlaylist
 import com.example.app.ui.components.PlaylistOption
+import com.example.app.ui.components.SongItem
 import com.example.app.ui.theme.Purple20
 import kotlinx.coroutines.launch
 import kotlin.math.sin
@@ -79,7 +81,6 @@ fun PlaylistScreen(
     val uiState by playlistViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
     var showCreatePlaylist by remember { mutableStateOf(false)}
     var showDeletePlaylist by remember { mutableStateOf(false)}
     var showPlaylistOption by remember { mutableStateOf(false) }
@@ -139,7 +140,6 @@ fun PlaylistScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
                 .background(Color(0xFF120320))
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues),
@@ -200,32 +200,39 @@ fun PlaylistScreen(
                 }
             }
             HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-            Row(
-                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton ( onClick = {showCreatePlaylist = true}, modifier = Modifier.size(80.dp)) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_add_circle),
-                        contentDescription = "Add playlist",
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Add New Playlist",
-                    style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                )
-            }
-            uiState.playlists.forEach { playlist ->
-                PlayListItem(playList = playlist, navController = navController,
-                    onMoreOptionClick = {
-                        showPlaylistOption = true
-                        playListClick = it
+            LazyColumn {
+                item {
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton ( onClick = {showCreatePlaylist = true}, modifier = Modifier.size(80.dp)) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_add_circle),
+                                contentDescription = "Add playlist",
+                                tint = Color.White,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Add New Playlist",
+                            style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                        )
                     }
-                )
+                }
+                if (uiState.playlists.isNotEmpty()){
+                    items(uiState.playlists.size) { index ->
+                        PlayListItem(playList = uiState.playlists[index], navController = navController,
+                            onMoreOptionClick = {
+                                showPlaylistOption = true
+                                playListClick = it
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }

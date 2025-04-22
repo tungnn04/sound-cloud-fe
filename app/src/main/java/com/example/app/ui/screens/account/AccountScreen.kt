@@ -53,6 +53,8 @@ fun AccountScreen(
     navController: NavController,
     accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    currentSong: Song?,
+    isPlaying: Boolean
 ) {
     val uiState by accountViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -163,7 +165,8 @@ fun AccountScreen(
             }
             uiState.songs.forEach { song ->
                 Spacer(modifier = Modifier.height(8.dp))
-                SongItem(song = song, onPlayClick = onPlayClick, onMoreOptionClick = { songClick = it })
+                SongItem(song = song, onPlayClick = onPlayClick, onMoreOptionClick = { songClick = it },
+                    currentSong = currentSong, isPlaying = isPlaying)
             }
         }
     }

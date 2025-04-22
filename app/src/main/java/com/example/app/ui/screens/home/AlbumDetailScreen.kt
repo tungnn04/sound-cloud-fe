@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,6 +68,9 @@ fun AlbumDetailScreen(
     albumDetailViewModel: AlbumDetailViewModel = viewModel(factory = AlbumDetailViewModel.factory),
     albumId: Int,
     onPlayClick: (Int) -> Unit,
+    onPlayAll: (List<Song>, Boolean) -> Unit,
+    currentSong: Song?,
+    isPlaying: Boolean
 ) {
     val uiState by albumDetailViewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -109,69 +113,72 @@ fun AlbumDetailScreen(
             actionIcon = R.drawable.ic_dots_vertical,
             color = Color(0xFF120320)
         )
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
                 .background(Color(0xFF120320))
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.album?.coverUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = uiState.album?.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth(0.85f)
-                    .aspectRatio(1f)
-                    .clip(CircleShape)
-            )
-            Text(
-                text = uiState.album?.title ?: "",
-                style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            val numSong = uiState.album?.songs?.size ?: 0
-            val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
-            Text(
-                text = "${uiState.album?.artistName} | $numSongText | ${uiState.album?.releaseYear}",
-                style = TextStyle(color = Color.Gray, fontSize = 14.sp)
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                AppButton(
-                    text = "Shuffle",
-                    onClick = { },
-                    style = ButtonStyle.PRIMARY,
-                    iconResId = R.drawable.ic_shuffle,
-                    modifier = Modifier.weight(1f)
+            item {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiState.album?.coverUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = uiState.album?.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
                 )
-                AppButton(
-                    text = "Play",
-                    onClick = { },
-                    style = ButtonStyle.SECONDARY,
-                    iconResId = R.drawable.ic_play_circle,
-                    modifier = Modifier.weight(1f)
+                Text(
+                    text = uiState.album?.title ?: "",
+                    style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
-            }
-            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                uiState.album?.songs?.forEach { song ->
-                    SongItem(
-                        song = song,
-                        onMoreOptionClick = {
-                            songClick = it
+                val numSong = uiState.album?.songs?.size ?: 0
+                val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
+                Text(
+                    text = "${uiState.album?.artistName} | $numSongText | ${uiState.album?.releaseYear}",
+                    style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    AppButton(
+                        text = "Shuffle",
+                        onClick = {
+                            onPlayAll(uiState.album?.songs ?: emptyList(), true)
                         },
-                        onPlayClick = onPlayClick
+                        style = ButtonStyle.PRIMARY,
+                        iconResId = R.drawable.ic_shuffle,
+                        modifier = Modifier.weight(1f)
                     )
+                    AppButton(
+                        text = "Play",
+                        onClick = {
+                            onPlayAll(uiState.album?.songs ?: emptyList(), false)
+                        },
+                        style = ButtonStyle.SECONDARY,
+                        iconResId = R.drawable.ic_play_circle,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            if (uiState.album?.songs?.isNotEmpty() == true){
+                items(uiState.album?.songs?.size ?: 0 ) { index ->
+                    SongItem(
+                        song = uiState.album!!.songs!![index],
+                        onMoreOptionClick = { songClick = it },
+                        onPlayClick = onPlayClick,
+                        currentSong = currentSong,
+                        isPlaying = isPlaying
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

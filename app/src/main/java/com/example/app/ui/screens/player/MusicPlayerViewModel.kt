@@ -33,13 +33,15 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 
 data class MusicPlayerUiState(
-    val playlist: List<Song?> = emptyList(),
+    val playlist: List<Song> = emptyList(),
     val currentSong: Song? = null,
     val isPlaying: Boolean = false,
     val currentPositionMs: Long = 0L,
     val durationMs: Long = 0L,
     val isLoading: Boolean = true,
     val error: String? = null,
+    val isShuffleEnabled: Boolean = false,
+    @Player.RepeatMode val repeatMode: Int = Player.REPEAT_MODE_OFF,
     val playlists: List<PlayList> = emptyList()
 ) {
 
@@ -74,6 +76,9 @@ class MusicPlayerViewModel(
     private var progressUpdateJob: Job? = null
 
     init {
+        exoPlayer.shuffleModeEnabled = _uiState.value.isShuffleEnabled
+        exoPlayer.repeatMode = _uiState.value.repeatMode
+
         setupPlayerListener()
         viewModelScope.launch {
             val res = playlistRepository.findAll();
@@ -139,10 +144,39 @@ class MusicPlayerViewModel(
                 stopProgressUpdates()
             }
 
+            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                Log.d("MusicPlayerVM_Listener", "[CALLBACK] onShuffleModeEnabledChanged: $shuffleModeEnabled")
+                _uiState.update { it.copy(isShuffleEnabled = shuffleModeEnabled) }
+            }
+
+            override fun onRepeatModeChanged(repeatMode: Int) {
+                Log.d("MusicPlayerVM_Listener", "[CALLBACK] onRepeatModeChanged: $repeatMode")
+                _uiState.update { it.copy(repeatMode = repeatMode) }
+            }
+
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
 
             }
         })
+    }
+
+    fun toggleShuffle() {
+        val currentShuffleState = _uiState.value.isShuffleEnabled
+        val newShuffleState = !currentShuffleState
+        exoPlayer.shuffleModeEnabled = newShuffleState
+        Log.d("MusicPlayerVM", "Toggled shuffle mode to: $newShuffleState")
+    }
+
+    fun cycleRepeatMode() {
+        val currentMode = _uiState.value.repeatMode
+        val nextMode = when (currentMode) {
+            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+            Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+            else -> Player.REPEAT_MODE_OFF
+        }
+        exoPlayer.repeatMode = nextMode
+        Log.d("MusicPlayerVM", "Cycled repeat mode to: $nextMode")
     }
 
     fun addSongToPlaylist(playlistId: Int, songId: Int) {
@@ -173,17 +207,19 @@ class MusicPlayerViewModel(
         }
     }
 
-    fun loadPlaylist(songs: List<Song>) {
+    fun loadPlaylist(songs: List<Song>, startShuffle: Boolean = false) {
         if (songs.isEmpty()) {
             _uiState.update { it.copy(isLoading = false, error = "Playlist is empty") }
             return
         }
-        _uiState.update { it.copy(playlist = songs, isLoading = true, error = null) }
+        _uiState.update { it.copy(playlist = songs, isLoading = true, error = null, isShuffleEnabled = startShuffle) }
         val mediaItems = songs.map { song ->
             song.toMediaItem()
         }
+        exoPlayer.shuffleModeEnabled = startShuffle
         exoPlayer.setMediaItems(mediaItems, /* resetPosition= */ true)
         exoPlayer.prepare()
+        exoPlayer.play()
     }
 
     private fun Song.toMediaItem(): MediaItem {
@@ -243,7 +279,7 @@ class MusicPlayerViewModel(
         } else {
             Log.d("MusicPlayerVM", "Song not found in current queue. Setting as new playlist.")
             val newMediaItem = song?.toMediaItem()
-            _uiState.update { it.copy(playlist = listOf(song)) }
+            _uiState.update { it.copy(playlist = listOf(song!!)) }
             newMediaItem?.let { exoPlayer.setMediaItem(it) }
             exoPlayer.playWhenReady = true
             Log.d("MusicPlayerVM", "Calling prepare() for new playlist.")

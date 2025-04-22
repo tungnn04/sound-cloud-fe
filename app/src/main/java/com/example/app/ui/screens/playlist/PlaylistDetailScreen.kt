@@ -7,23 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -64,7 +54,10 @@ fun PlaylistDetailScreen(
     playlistId: Int,
     navController: NavController,
     playlistDetailViewModel: PlaylistDetailViewModel = viewModel(factory = PlaylistDetailViewModel.factory),
-    onPlayClick: (Int) -> Unit
+    onPlayClick: (Int) -> Unit,
+    onPlayAll: (List<Song>, Boolean) -> Unit,
+    currentSong: Song?,
+    isPlaying: Boolean
 ) {
     val uiState by playlistDetailViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -150,67 +143,71 @@ fun PlaylistDetailScreen(
             actionIcon = R.drawable.ic_dots_vertical,
             color = Color(0xFF120320)
         )
-        Column(
+        LazyColumn (
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF120320))
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.playlist?.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
-                    .crossfade(true)
-                    .build(),
-                contentDescription = uiState.playlist?.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(160.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
-            Text(
-                text = uiState.playlist?.name ?: "",
-                style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            val numSong = uiState.playlist?.songs?.size ?: 0
-            val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
-            Text(
-                text = numSongText,
-                style = TextStyle(color = Color.Gray, fontSize = 14.sp)
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                AppButton(
-                    text = "Shuffle",
-                    onClick = { },
-                    style = ButtonStyle.PRIMARY,
-                    iconResId = R.drawable.ic_shuffle,
-                    modifier = Modifier.weight(1f)
+            item {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiState.playlist?.coverUrl ?: "https://cdn2.tuoitre.vn/thumb_w/480/2020/6/16/photo-1-15923021035102079282540.jpg")
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = uiState.playlist?.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(160.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 )
-                AppButton(
-                    text = "Play",
-                    onClick = { },
-                    style = ButtonStyle.SECONDARY,
-                    iconResId = R.drawable.ic_play_circle,
-                    modifier = Modifier.weight(1f)
+                Text(
+                    text = uiState.playlist?.name ?: "",
+                    style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
-            }
-            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                uiState.playlist?.songs?.forEach { song ->
-                    SongItem(
-                        song,
-                        onMoreOptionClick = {
-                            songClick = it
+                val numSong = uiState.playlist?.songs?.size ?: 0
+                val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
+                Text(
+                    text = numSongText,
+                    style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    AppButton(
+                        text = "Shuffle",
+                        onClick = {
+                            onPlayAll(uiState.playlist?.songs ?: emptyList(), true)
                         },
-                        onPlayClick
+                        style = ButtonStyle.PRIMARY,
+                        iconResId = R.drawable.ic_shuffle,
+                        modifier = Modifier.weight(1f)
                     )
+                    AppButton(
+                        text = "Play",
+                        onClick = {
+                            onPlayAll(uiState.playlist?.songs ?: emptyList(), false)
+                        },
+                        style = ButtonStyle.SECONDARY,
+                        iconResId = R.drawable.ic_play_circle,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            if (uiState.playlist?.songs?.isNotEmpty() == true){
+                items(uiState.playlist?.songs?.size ?: 0 ) { index ->
+                    SongItem(
+                        song = uiState.playlist!!.songs!![index],
+                        onMoreOptionClick = { songClick = it },
+                        onPlayClick = onPlayClick,
+                        currentSong = currentSong,
+                        isPlaying = isPlaying
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }

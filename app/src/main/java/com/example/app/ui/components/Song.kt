@@ -26,12 +26,15 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
+import com.example.app.ui.theme.Pink20
 
 @Composable
 fun SongItem(
      song: Song,
      onMoreOptionClick: (Song) -> Unit,
      onPlayClick: (Int) -> Unit,
+     currentSong: Song?,
+     isPlaying: Boolean
 ) {
     Row(
          verticalAlignment = Alignment.CenterVertically,
@@ -69,9 +72,9 @@ fun SongItem(
          Row {
               IconButton(onClick = {onPlayClick(song.id)}) {
                    Icon(
-                        painterResource(id = R.drawable.ic_play_circle),
+                        painterResource(id = if (currentSong?.id == song.id && isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
                         contentDescription = "Play song",
-                        tint = Color.White,
+                        tint = if (currentSong?.id == song.id) Pink20 else Color.White,
                         modifier = Modifier.size(32.dp)
                    )
               }
@@ -91,13 +94,15 @@ fun ListSong(
      listSong: List<Song>,
      onMoreOptionClick: (Song) -> Unit,
      onPlayClick: (Int) -> Unit,
+     currentSong: Song?,
+     isPlaying: Boolean
 ){
      LazyColumn(
           modifier = Modifier.fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(8.dp)
      ) {
           items(listSong.size) { index ->
-               SongItem(listSong[index], onPlayClick = onPlayClick, onMoreOptionClick = onMoreOptionClick )
+               SongItem(listSong[index], onPlayClick = onPlayClick, onMoreOptionClick = onMoreOptionClick, currentSong = currentSong, isPlaying = isPlaying )
           }
      }
 }

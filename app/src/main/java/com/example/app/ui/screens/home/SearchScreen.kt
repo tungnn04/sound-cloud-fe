@@ -71,7 +71,9 @@ import kotlinx.coroutines.launch
 fun SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.factory),
-    onPlayClick: (Int) -> Unit
+    onPlayClick: (Int) -> Unit,
+    currentSong: Song?,
+    isPlaying: Boolean
 ) {
     val uiState by searchViewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -236,7 +238,9 @@ fun SearchScreen(
                         onPlayClick = onPlayClick,
                         onMoreOptionClick = {
                             songClick = it
-                        }
+                        },
+                        currentSong = currentSong,
+                        isPlaying = isPlaying
                     )
                 }
             }
@@ -285,10 +289,11 @@ fun NotFoundContent() {
 }
 
 @Composable
-fun SearchResultList(uiState: SearchUiState, navController: NavController, onPlayClick: (Int) -> Unit, onMoreOptionClick: (Song) -> Unit) {
+fun SearchResultList(uiState: SearchUiState, navController: NavController, onPlayClick: (Int) -> Unit,
+                     onMoreOptionClick: (Song) -> Unit, currentSong: Song?, isPlaying: Boolean) {
     when (uiState.searchCategory) {
         SearchCategory.SONGS -> {
-            ListSong(uiState.listSong, onMoreOptionClick ,onPlayClick )
+            ListSong(uiState.listSong, onMoreOptionClick ,onPlayClick, currentSong, isPlaying)
         }
         SearchCategory.ARTISTS -> {
             ListArtist(uiState.listArtist, navController)

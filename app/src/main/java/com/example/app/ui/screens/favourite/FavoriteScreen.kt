@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -47,6 +50,7 @@ import com.example.app.model.Song
 import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.ConfirmationPrompt
+import com.example.app.ui.components.ListSong
 import com.example.app.ui.components.SongItem
 import com.example.app.ui.components.SongOption
 import com.example.app.ui.components.SongOptionMenu
@@ -59,11 +63,13 @@ fun FavoriteScreen(
     navController: NavController,
     favoriteViewModel: FavoriteViewModel = viewModel(factory = FavoriteViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    onPlayAll: (List<Song>, Boolean) -> Unit,
+    currentSong: Song?,
+    isPlaying: Boolean
 ) {
     val uiState by favoriteViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
     var showDeleteFavorite by remember { mutableStateOf(false) }
     var songClick by remember { mutableStateOf<Song?>(null) }
 
@@ -105,7 +111,6 @@ fun FavoriteScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
                 .background(Color(0xFF120320))
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues),
@@ -141,48 +146,64 @@ fun FavoriteScreen(
                 },
                 playlists = uiState.playlists
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                AppButton(
-                    text = "Shuffle",
-                    onClick = {},
-                    style = ButtonStyle.PRIMARY,
-                    iconResId = R.drawable.ic_shuffle
-                )
-                AppButton(
-                    text = "Play",
-                    onClick = {},
-                    style = ButtonStyle.SECONDARY,
-                    iconResId = R.drawable.ic_play_circle
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val numSong = uiState.songs.size
-                val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
-                Text(
-                    text = numFavoriteText,
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
-                )
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF120320))) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_swap),
-                        contentDescription = "Sort",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+            LazyColumn {
+                item {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        AppButton(
+                            text = "Shuffle",
+                            onClick = {
+                                onPlayAll(uiState.songs, true)
+                            },
+                            style = ButtonStyle.PRIMARY,
+                            iconResId = R.drawable.ic_shuffle
+                        )
+                        AppButton(
+                            text = "Play",
+                            onClick = {
+                                onPlayAll(uiState.songs, false)
+                            },
+                            style = ButtonStyle.SECONDARY,
+                            iconResId = R.drawable.ic_play_circle
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        val numSong = uiState.songs.size
+                        val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
+                        Text(
+                            text = numFavoriteText,
+                            style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
+                        )
+                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF120320))) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_swap),
+                                contentDescription = "Sort",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
-            }
-            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-            uiState.songs.forEach { song ->
-                SongItem(song = song, onMoreOptionClick = { songClick = it } , onPlayClick = onPlayClick)
+                if (uiState.songs.isNotEmpty()){
+                    items(uiState.songs.size) { index ->
+                        SongItem(
+                            song = uiState.songs[index],
+                            onMoreOptionClick = { songClick = it },
+                            onPlayClick = onPlayClick,
+                            currentSong = currentSong,
+                            isPlaying = isPlaying
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }

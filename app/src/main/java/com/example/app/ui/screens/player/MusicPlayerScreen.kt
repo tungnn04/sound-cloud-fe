@@ -14,19 +14,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
+import androidx.media3.common.Player.RepeatMode
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
+import com.example.app.model.Song
+import com.example.app.ui.components.ListSong
+import com.example.app.ui.components.SongOptionMenu
 import com.example.app.ui.components.TopBar
+import com.example.app.ui.theme.Pink20
+import com.example.app.ui.theme.Purple20
 
 
 @Composable
 fun MusicPlayerScreen(
     musicPlayerViewModel: MusicPlayerViewModel,
     onMinimize: () -> Unit,
+    onPlayClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val uiState by musicPlayerViewModel.uiState.collectAsState()
+    var songClick by remember { mutableStateOf<Song?>(null) }
     var isFavorite by remember { mutableStateOf(uiState.currentSong!!.isFavorite) }
 
     LaunchedEffect(uiState.error) {
@@ -36,6 +45,21 @@ fun MusicPlayerScreen(
     }
 
     Column {
+        SongOptionMenu(
+            song = songClick,
+            onDismissClick = { songClick = null },
+            onPlayNextClick = { },
+            onFavoriteClick = { songId, isFavorite ->
+                musicPlayerViewModel.favoriteChange(songId, isFavorite)
+            },
+            onAddToPlaylist = { songId, playlistId ->
+                musicPlayerViewModel.addSongToPlaylist(songId, playlistId)
+            },
+            onCreatePlaylist = { playlistName ->
+                musicPlayerViewModel.createPlaylist(playlistName)
+            },
+            playlists = uiState.playlists
+        )
         TopBar(
             title = "",
             onNavigationClick = { onMinimize() },
@@ -46,7 +70,9 @@ fun MusicPlayerScreen(
             navigationIcon = R.drawable.ic_chevron_down,
             actionIcon = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline,
             color = Color(0xFF120320),
-            modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
         )
         Column(
             modifier = Modifier
@@ -129,8 +155,24 @@ fun MusicPlayerScreen(
                 isPlaying = uiState.isPlaying,
                 onPlayPauseClick = { musicPlayerViewModel.playPause() },
                 onNextClick = { musicPlayerViewModel.seekToNext() },
-                onPreviousClick = { musicPlayerViewModel.seekToPrevious() }
+                onPreviousClick = { musicPlayerViewModel.seekToPrevious() },
+                onShuffleClick = { musicPlayerViewModel.toggleShuffle() },
+                onRepeatClick = {musicPlayerViewModel.cycleRepeatMode()},
+                isShuffle = uiState.isShuffleEnabled,
+                repeatMode = uiState.repeatMode
             )
+
+            if (uiState.playlist.isNotEmpty()){
+                ListSong(
+                    listSong = uiState.playlist,
+                    onMoreOptionClick = {
+                        songClick = it
+                    },
+                    onPlayClick = onPlayClick,
+                    currentSong = uiState.currentSong,
+                    isPlaying = uiState.isPlaying
+                )
+            }
         }
     }
 }
@@ -139,11 +181,13 @@ fun MusicPlayerScreen(
 fun PlayerControls(
     modifier: Modifier = Modifier,
     isPlaying: Boolean = false,
-    onPlayPauseClick: () -> Unit = {},
-    onNextClick: () -> Unit = {},
-    onPreviousClick: () -> Unit = {},
-    onShuffleClick: () -> Unit = {},
-    onRepeatClick: () -> Unit = {}
+    repeatMode: Int,
+    isShuffle: Boolean,
+    onPlayPauseClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onPreviousClick: () -> Unit,
+    onShuffleClick: () -> Unit,
+    onRepeatClick: () -> Unit
 ) {
     Row(
         modifier = modifier.padding(vertical = 8.dp),
@@ -154,7 +198,7 @@ fun PlayerControls(
             Icon(
                 painterResource(id = R.drawable.ic_shuffle),
                 contentDescription = "Shuffle",
-                tint = Color.White // TODO: Thay đổi màu khi shuffle bật
+                tint = if (isShuffle) Pink20 else Color.White
             )
         }
         IconButton(onClick = onPreviousClick, modifier = Modifier.size(48.dp)) {
@@ -180,47 +224,23 @@ fun PlayerControls(
             )
         }
         IconButton(onClick = onRepeatClick, modifier = Modifier.size(48.dp)) {
-            Icon(
-                painterResource(id = R.drawable.ic_repeat),
-                contentDescription = "Repeat",
-                tint = Color.White
-            )
-        }
-    }
-}
-
-// --- Preview ---
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, backgroundColor = 0xFF121212)
-@Composable
-fun MusicPlayerScreenPreview() {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Now Playing") }) },
-        containerColor = Color(0xFF121212)
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(modifier = Modifier.fillMaxWidth(0.8f).aspectRatio(1f).background(Color.Gray))
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("Song Title", style = MaterialTheme.typography.headlineSmall, color = Color.White)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text("Artist Name", style = MaterialTheme.typography.bodyMedium, color = Color.LightGray)
-            Spacer(modifier = Modifier.height(24.dp))
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Slider(value = 0.3f, onValueChange = {}, modifier = Modifier.fillMaxWidth(), valueRange = 0f..1f)
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("1:23", style = MaterialTheme.typography.labelSmall, color = Color.LightGray)
-                    Text("4:05", style = MaterialTheme.typography.labelSmall, color = Color.LightGray)
-                }
+            when(repeatMode) {
+                0 -> Icon(
+                    painterResource(id = R.drawable.ic_repeat),
+                    contentDescription = "Repeat",
+                    tint = Color.White
+                )
+                1 -> Icon(
+                    painterResource(id = R.drawable.ic_repeat_once),
+                    contentDescription = "Repeat",
+                    tint = Pink20
+                )
+                2 -> Icon(
+                    painterResource(id = R.drawable.ic_repeat),
+                    contentDescription = "Repeat",
+                    tint = Pink20
+                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerControls(isPlaying = false)
         }
     }
 }

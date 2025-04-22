@@ -58,6 +58,7 @@ import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
+import com.example.app.model.Song
 import com.example.app.ui.screens.account.AccountScreen
 import com.example.app.ui.screens.auth.ForgotPasswordScreen
 import com.example.app.ui.screens.home.HomeScreen
@@ -114,10 +115,15 @@ fun MusicApp() {
         }
     }
 
-
     val handlePlayClick: (Int) -> Unit = { songId ->
         coroutineScope.launch {
             musicPlayerViewModel.playSongImmediately(songId)
+        }
+    }
+
+    val handlePlayAll: (List<Song>, Boolean) -> Unit = { songs, isShuffle ->
+        coroutineScope.launch {
+            musicPlayerViewModel.loadPlaylist(songs = if (!isShuffle) songs else songs.shuffled(), startShuffle = isShuffle)
         }
     }
 
@@ -180,16 +186,19 @@ fun MusicApp() {
                 ForgotPasswordScreen(navController = navController)
             }
             composable(MusicScreen.ACCOUNT.name) {
-                AccountScreen(navController = navController, onPlayClick = handlePlayClick)
+                AccountScreen(navController = navController, onPlayClick = handlePlayClick,
+                    currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(MusicScreen.PLAYLIST.name) {
                 PlaylistScreen(navController = navController)
             }
             composable(MusicScreen.FAVORITE.name) {
-                FavoriteScreen(navController = navController, onPlayClick = handlePlayClick)
+                FavoriteScreen(navController = navController, onPlayClick = handlePlayClick,
+                    onPlayAll = handlePlayAll, currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(MusicScreen.SEARCH.name) {
-                SearchScreen(navController = navController, onPlayClick = handlePlayClick)
+                SearchScreen(navController = navController, onPlayClick = handlePlayClick,
+                    currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(
                 "${MusicScreen.ALBUM_DETAIL.name}/{id}",
@@ -199,7 +208,10 @@ fun MusicApp() {
                  AlbumDetailScreen(
                      navController = navController,
                      albumId = albumId,
-                     onPlayClick = handlePlayClick
+                     onPlayClick = handlePlayClick,
+                     onPlayAll = handlePlayAll,
+                     currentSong = uiState.currentSong,
+                     isPlaying = uiState.isPlaying
                  )
             }
             composable(
@@ -210,7 +222,10 @@ fun MusicApp() {
                 ArtistDetailScreen(
                     navController = navController,
                     artistId = artistId,
-                    onPlayClick = handlePlayClick
+                    onPlayClick = handlePlayClick,
+                    onPlayAll = handlePlayAll,
+                    currentSong = uiState.currentSong,
+                    isPlaying = uiState.isPlaying
                 )
             }
             composable(
@@ -221,14 +236,18 @@ fun MusicApp() {
                 PlaylistDetailScreen(
                     navController = navController,
                     playlistId = playlistId,
-                    onPlayClick = handlePlayClick
+                    onPlayClick = handlePlayClick,
+                    onPlayAll = handlePlayAll,
+                    currentSong = uiState.currentSong,
+                    isPlaying = uiState.isPlaying
                 )
             }
         }
         if (isPlayerScreenVisible) {
             MusicPlayerScreen(
                 musicPlayerViewModel = musicPlayerViewModel,
-                onMinimize = { isPlayerScreenVisible = false }
+                onMinimize = { isPlayerScreenVisible = false },
+                onPlayClick = handlePlayClick
             )
         }
     }
