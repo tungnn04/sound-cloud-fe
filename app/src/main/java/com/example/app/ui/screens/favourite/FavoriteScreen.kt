@@ -46,6 +46,7 @@ import com.example.app.R
 import com.example.app.model.Song
 import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.ButtonStyle
+import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.SongItem
 import com.example.app.ui.components.SongOption
 import com.example.app.ui.components.SongOptionMenu
@@ -63,6 +64,7 @@ fun FavoriteScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var showDeleteFavorite by remember { mutableStateOf(false) }
     var songClick by remember { mutableStateOf<Song?>(null) }
 
     LaunchedEffect(true) {
@@ -110,12 +112,26 @@ fun FavoriteScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            ConfirmationPrompt(
+                showConfirmationPrompt = showDeleteFavorite,
+                title = songClick?.title ?: "",
+                message = "Are you sure remove this song in favorites ?",
+                onCancel = {
+                    showDeleteFavorite = false
+                    songClick = null
+                },
+                onDelete = {
+                    favoriteViewModel.deleteSong(songClick!!.id)
+                    showDeleteFavorite = false
+                    songClick = null
+                }
+            )
             SongOptionMenu(
                 song = songClick,
                 onDismissClick = { songClick = null },
                 onPlayNextClick = { },
                 onFavoriteClick = { songId, isFavorite ->
-                    favoriteViewModel.favoriteChange(songId, isFavorite)
+                    showDeleteFavorite = true
                 },
                 onAddToPlaylist = { songId, playlistId ->
                     favoriteViewModel.addSongToPlaylist(songId, playlistId)

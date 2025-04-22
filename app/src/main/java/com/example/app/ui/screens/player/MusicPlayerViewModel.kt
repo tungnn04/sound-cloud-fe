@@ -5,6 +5,7 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -21,7 +22,6 @@ import com.example.app.data.PlaylistRepository
 import com.example.app.data.SongRepository
 import com.example.app.model.PlayList
 import com.example.app.model.Song
-import com.example.app.ui.screens.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,9 +63,9 @@ data class MusicPlayerUiState(
 class MusicPlayerViewModel(
     private val application: Application,
     private val songRepository: SongRepository,
-    playlistRepository: PlaylistRepository,
-    favoriteRepository: FavoriteRepository
-) : BaseViewModel(playlistRepository, favoriteRepository) {
+    private val playlistRepository: PlaylistRepository,
+    private val favoriteRepository: FavoriteRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MusicPlayerUiState())
     val uiState: StateFlow<MusicPlayerUiState> = _uiState.asStateFlow()
@@ -75,6 +75,12 @@ class MusicPlayerViewModel(
 
     init {
         setupPlayerListener()
+        viewModelScope.launch {
+            val res = playlistRepository.findAll();
+            if (res.isSuccessful) {
+                _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
+            }
+        }
     }
 
     private fun setupPlayerListener() {
@@ -137,6 +143,34 @@ class MusicPlayerViewModel(
 
             }
         })
+    }
+
+    fun addSongToPlaylist(playlistId: Int, songId: Int) {
+        viewModelScope.launch {
+            playlistRepository.addSong(playlistId, songId)
+        }
+    }
+
+    fun createPlaylist(name: String) {
+        viewModelScope.launch {
+            playlistRepository.createPlaylist(name)
+            val res = playlistRepository.findAll();
+            if (res.isSuccessful) {
+                _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
+            }
+        }
+    }
+
+    fun favoriteChange(songId: Int, isFavorite: Boolean) {
+        if (isFavorite) {
+            viewModelScope.launch {
+                favoriteRepository.deleteSong(songId)
+            }
+        } else {
+            viewModelScope.launch {
+                favoriteRepository.addSong(songId)
+            }
+        }
     }
 
     fun loadPlaylist(songs: List<Song>) {

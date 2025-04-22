@@ -349,7 +349,7 @@ fun AddPlaylist(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        onAddToPlaylist(songId, playlist.id)
+                                        onAddToPlaylist(playlist.id, songId)
                                         onDismissClick()
                                         Toast.makeText(context, "Added to ${playlist.name}", Toast.LENGTH_SHORT).show()
                                     },

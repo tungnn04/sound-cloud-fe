@@ -1,6 +1,8 @@
 package com.example.app.ui.screens.account
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
@@ -11,9 +13,9 @@ import com.example.app.data.UserRepository
 import com.example.app.model.PlayList
 import com.example.app.model.Song
 import com.example.app.model.User
-import com.example.app.ui.screens.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.io.File
 
 class AccountViewModel(
@@ -21,7 +23,7 @@ class AccountViewModel(
     private val songRepository: SongRepository,
     private val playlistRepository: PlaylistRepository,
     private val favoriteRepository: FavoriteRepository,
-): BaseViewModel(playlistRepository, favoriteRepository) {
+): ViewModel() {
     private val _uiState = MutableStateFlow(AccountUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -34,9 +36,9 @@ class AccountViewModel(
         if (songsResponse.isSuccessful) {
             _uiState.value = _uiState.value.copy(songs = songsResponse.body()?.data ?: emptyList())
         }
-        val playlistsResponse = playlistRepository.findAll()
-        if (playlistsResponse.isSuccessful) {
-            _uiState.value = _uiState.value.copy(playlists = playlistsResponse.body()?.data ?: emptyList())
+        val res = playlistRepository.findAll();
+        if (res.isSuccessful) {
+            _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
     }
 
@@ -44,6 +46,33 @@ class AccountViewModel(
 
     }
 
+    fun createPlaylist(name: String) {
+        viewModelScope.launch {
+            playlistRepository.createPlaylist(name)
+            val res = playlistRepository.findAll();
+            if (res.isSuccessful) {
+                _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
+            }
+        }
+    }
+
+    fun favoriteChange(songId: Int, isFavorite: Boolean) {
+        if (isFavorite) {
+            viewModelScope.launch {
+                favoriteRepository.deleteSong(songId)
+            }
+        } else {
+            viewModelScope.launch {
+                favoriteRepository.addSong(songId)
+            }
+        }
+    }
+
+    fun addSongToPlaylist(playlistId: Int, songId: Int) {
+        viewModelScope.launch {
+            playlistRepository.addSong(playlistId, songId)
+        }
+    }
 
     suspend fun updateProfile(fullName: String, avatarImage: Pair<File, String>?) {
         val response = userRepository.updateUser(fullName, avatarImage)
