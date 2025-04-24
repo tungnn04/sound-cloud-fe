@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -62,7 +63,8 @@ fun ArtistItem(
             ) {
                 Text(
                     text = artist.name,
-                    style = TextStyle(color = Color.White, fontSize = 14.sp),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(top = 4.dp)
                 )
 
@@ -73,7 +75,8 @@ fun ArtistItem(
 
                 Text(
                     text = "$numAlbumsText | $numSongsText",
-                    style = TextStyle(color = Color.Gray, fontSize = 12.sp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -81,7 +84,7 @@ fun ArtistItem(
             Icon(
                 painterResource(id = R.drawable.ic_dots_vertical),
                 contentDescription = "More options",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

@@ -25,8 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,17 +35,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.model.Album
@@ -81,7 +75,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF120320))
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(scrollState)
             .padding(bottom = 16.dp)
     ) {
@@ -115,18 +109,13 @@ fun Header(name: String) {
             .padding(16.dp)
     ) {
         Text(text = name,
-            style = TextStyle(
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
             text = "What you want to hear today?",
-            style = TextStyle(
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -137,7 +126,7 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 32.dp, end = 48.dp, bottom = 16.dp)
-            .background(Color(0xFF311947), RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable { onSearchClick() }
     ) {
@@ -147,10 +136,10 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search Icon",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Search", style = TextStyle(color = Color.Gray))
+            Text("Search", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
@@ -160,11 +149,8 @@ fun SectionTitle(title: String) {
     Spacer(modifier = Modifier.height(24.dp))
     Text(
         text = title,
-        style = TextStyle(
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        ),
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.padding(bottom = 8.dp).padding(horizontal = 16.dp)
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -201,7 +187,8 @@ private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
         )
         Text(
             text = song.title,
-            style = TextStyle(color = Color.White, fontSize = 14.sp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
     }
@@ -226,12 +213,14 @@ private fun AlbumItem(album: Album, navController: NavController) {
         )
         Text(
             text = album.title,
-            style = TextStyle(color = Color.White, fontSize = 14.sp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
         Text(
             text = album.artistName,
-            style = TextStyle(color = Color.Gray, fontSize = 12.sp)
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -256,7 +245,8 @@ private fun ArtistItem(artist: Artist, navController: NavController) {
         )
         Text(
             text = artist.name,
-            style = TextStyle(color = Color.White, fontSize = 14.sp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
     }
@@ -279,7 +269,8 @@ fun CategoryItem(category: Category) {
         )
         Text(
             text = category.name,
-            style = TextStyle(color = Color.White, fontSize = 14.sp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
     }

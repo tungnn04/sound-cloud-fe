@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,10 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -141,12 +139,12 @@ fun PlaylistDetailScreen(
             },
             navigationIcon = R.drawable.ic_back,
             actionIcon = R.drawable.ic_dots_vertical,
-            color = Color(0xFF120320)
+            color = MaterialTheme.colorScheme.background
         )
         LazyColumn (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -163,14 +161,16 @@ fun PlaylistDetailScreen(
                 )
                 Text(
                     text = uiState.playlist?.name ?: "",
-                    style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
                 val numSong = uiState.playlist?.songs?.size ?: 0
                 val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
                 Text(
                     text = numSongText,
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),

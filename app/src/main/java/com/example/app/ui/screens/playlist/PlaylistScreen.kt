@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -59,18 +60,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
-import com.example.app.model.CreatePlaylist
 import com.example.app.model.PlayList
 import com.example.app.ui.MusicScreen
-import com.example.app.ui.components.AppButton
-import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.CreatePlaylist
 import com.example.app.ui.components.PlaylistOption
-import com.example.app.ui.components.SongItem
-import com.example.app.ui.theme.Purple20
 import kotlinx.coroutines.launch
-import kotlin.math.sin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,19 +115,20 @@ fun PlaylistScreen(
                 title = {
                     Text(
                         text = "Playlists",
-                        style = TextStyle(color = Color.White, fontSize = 28.sp)
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     ) },
-                actions = {
-                    IconButton(onClick = {  }) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_search),
-                            contentDescription = "Search",
-                            tint = Color.White
-                        )
-                    }
-                },
+//                actions = {
+//                    IconButton(onClick = {  }) {
+//                        Icon(
+//                            painterResource(id = R.drawable.ic_search),
+//                            contentDescription = "Search",
+//                            tint = Color.White
+//                        )
+//                    }
+//                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF120320)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -140,7 +136,7 @@ fun PlaylistScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -188,7 +184,8 @@ fun PlaylistScreen(
                 val numPlaylistText = if (numPlaylist > 1) "$numPlaylist playlists" else "$numPlaylist playlist"
                 Text(
                     text = numPlaylistText,
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF120320))) {
                     Icon(
@@ -211,14 +208,15 @@ fun PlaylistScreen(
                             Icon(
                                 painterResource(id = R.drawable.ic_add_circle),
                                 contentDescription = "Add playlist",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Add New Playlist",
-                            style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -245,14 +243,14 @@ private fun PlayListItem(
     navController: NavController
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { navController.navigate("${MusicScreen.PLAYLIST_DETAIL.name}/${playList.id}") },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { navController.navigate("${MusicScreen.PLAYLIST_DETAIL.name}/${playList.id}") }
+            modifier = Modifier
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -270,13 +268,15 @@ private fun PlayListItem(
             ) {
                 Text(
                     text = playList.name,
-                    style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 val numSong = playList.songs?.size ?: 0
                 val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
                 Text(
                     text = numSongText,
-                    style = TextStyle(color = Color.Gray, fontSize = 12.sp, textAlign = TextAlign.Start),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -284,7 +284,7 @@ private fun PlayListItem(
             Icon(
                 painterResource(id = R.drawable.ic_dots_vertical),
                 contentDescription = "More options",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

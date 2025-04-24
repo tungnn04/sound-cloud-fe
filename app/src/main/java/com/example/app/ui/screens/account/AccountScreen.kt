@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,7 +82,7 @@ fun AccountScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(color = Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues)
         ) {
@@ -120,11 +121,13 @@ fun AccountScreen(
                 ) {
                     Text(
                         text = uiState.user?.fullName ?: "",
-                        style = TextStyle(color = Color.White, fontSize = 20.sp)
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = uiState.user?.email ?: "",
-                        style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -153,13 +156,14 @@ fun AccountScreen(
             ) {
                 Text(
                     text = "My upload",
-                    style = TextStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 IconButton(onClick = { }) {
                     Icon(
                         painterResource(id = R.drawable.ic_add_circle),
                         contentDescription = "Add",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

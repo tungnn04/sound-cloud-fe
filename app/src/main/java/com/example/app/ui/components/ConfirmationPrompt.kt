@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.app.ui.theme.Purple20
 
 @Composable
 fun ConfirmationPrompt(
@@ -39,19 +38,21 @@ fun ConfirmationPrompt(
             Column(
                 modifier = modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Purple20)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(16.dp)
             ) {
                 Text(
                     text = title,
-                    style = TextStyle(fontSize = 20.sp, color = Color.White),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = message,
-                    style = TextStyle(fontSize = 15.sp, color = Color.White),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

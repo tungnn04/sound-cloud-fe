@@ -12,10 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.Player
-import androidx.media3.common.Player.RepeatMode
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
@@ -23,8 +20,6 @@ import com.example.app.model.Song
 import com.example.app.ui.components.ListSong
 import com.example.app.ui.components.SongOptionMenu
 import com.example.app.ui.components.TopBar
-import com.example.app.ui.theme.Pink20
-import com.example.app.ui.theme.Purple20
 
 
 @Composable
@@ -198,7 +193,7 @@ fun PlayerControls(
             Icon(
                 painterResource(id = R.drawable.ic_shuffle),
                 contentDescription = "Shuffle",
-                tint = if (isShuffle) Pink20 else Color.White
+                tint = if (isShuffle) MaterialTheme.colorScheme.onPrimary else Color.White
             )
         }
         IconButton(onClick = onPreviousClick, modifier = Modifier.size(48.dp)) {
@@ -233,12 +228,12 @@ fun PlayerControls(
                 1 -> Icon(
                     painterResource(id = R.drawable.ic_repeat_once),
                     contentDescription = "Repeat",
-                    tint = Pink20
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
                 2 -> Icon(
                     painterResource(id = R.drawable.ic_repeat),
                     contentDescription = "Repeat",
-                    tint = Pink20
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

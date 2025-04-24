@@ -1,6 +1,5 @@
 package com.example.app.ui.screens.home
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,22 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,13 +44,9 @@ import com.example.app.model.Song
 import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.SongItem
-import com.example.app.ui.components.SongOption
 import com.example.app.ui.components.SongOptionMenu
 import com.example.app.ui.components.TopBar
-import com.example.app.ui.screens.playlist.PlaylistViewModel
-import com.example.app.ui.theme.Purple20
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumDetailScreen(
     navController: NavController,
@@ -134,14 +119,16 @@ fun AlbumDetailScreen(
                 )
                 Text(
                     text = uiState.album?.title ?: "",
-                    style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
                 val numSong = uiState.album?.songs?.size ?: 0
                 val numSongText = if (numSong > 1) "$numSong songs" else "$numSong song"
                 Text(
                     text = "${uiState.album?.artistName} | $numSongText | ${uiState.album?.releaseYear}",
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),

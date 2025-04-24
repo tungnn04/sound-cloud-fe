@@ -25,6 +25,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -63,7 +64,6 @@ import com.example.app.ui.components.ListAlbum
 import com.example.app.ui.components.ListArtist
 import com.example.app.ui.components.ListSong
 import com.example.app.ui.components.SongOptionMenu
-import com.example.app.ui.screens.playlist.PlaylistViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +116,10 @@ fun SearchScreen(
                 TextField(
                     value = uiState.searchText,
                     onValueChange = { searchViewModel.setSearchText(it) },
-                    placeholder = { Text("Search" , style = TextStyle(color = Color.Gray, fontSize = 14.sp)) },
+                    placeholder = {
+                        Text("Search" ,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -170,13 +173,13 @@ fun SearchScreen(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFF120320)
+                containerColor = MaterialTheme.colorScheme.background
             )
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .pointerInput(Unit) {
                     detectTapGestures {
@@ -254,12 +257,14 @@ fun CategoryButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color(0xFFFFA500) else Color.White,
-            contentColor = if (isSelected) Color.White else Color(0xFFFFA500)
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
         ),
         modifier = Modifier.padding(end = 8.dp)
     ) {
-        Text(text = text)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium)
     }
 }
 
@@ -276,12 +281,14 @@ fun NotFoundContent() {
         )
         Text(
             text = "Not Found",
-            style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(top = 8.dp)
         )
         Text(
             text = "Sorry the keyword you entered cannot be found, please check again or search with another keyword",
-            style = TextStyle(color = Color.White, fontSize = 12.sp),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )

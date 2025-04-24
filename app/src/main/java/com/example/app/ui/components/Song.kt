@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,7 +27,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
-import com.example.app.ui.theme.Pink20
 
 @Composable
 fun SongItem(
@@ -59,12 +59,14 @@ fun SongItem(
                ) {
                     Text(
                          text = song.title,
-                         style = TextStyle(color = Color.White, fontSize = 14.sp),
+                         style = MaterialTheme.typography.titleMedium,
+                         color = MaterialTheme.colorScheme.onSurface,
                          modifier = Modifier.padding(top = 4.dp)
                     )
                     Text(
                          text = song.artistName ?: "Unknown artist",
-                         style = TextStyle(color = Color.Gray, fontSize = 12.sp)
+                         style = MaterialTheme.typography.bodyMedium,
+                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                }
           }
@@ -74,7 +76,7 @@ fun SongItem(
                    Icon(
                         painterResource(id = if (currentSong?.id == song.id && isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
                         contentDescription = "Play song",
-                        tint = if (currentSong?.id == song.id) Pink20 else Color.White,
+                        tint = if (currentSong?.id == song.id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(32.dp)
                    )
               }
@@ -82,7 +84,7 @@ fun SongItem(
                    Icon(
                         painterResource(id = R.drawable.ic_dots_vertical),
                         contentDescription = "More options",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurface
                    )
               }
          }

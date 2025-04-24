@@ -12,20 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,12 +45,8 @@ import com.example.app.model.Song
 import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.ConfirmationPrompt
-import com.example.app.ui.components.ListSong
 import com.example.app.ui.components.SongItem
-import com.example.app.ui.components.SongOption
 import com.example.app.ui.components.SongOptionMenu
-import com.example.app.ui.screens.playlist.PlaylistViewModel
-import com.example.app.ui.theme.Purple20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,19 +82,20 @@ fun FavoriteScreen(
                 title = {
                     Text(
                         text = "Favorites",
-                        style = TextStyle(color = Color.White, fontSize = 28.sp)
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     ) },
-                actions = {
-                    IconButton(onClick = {  }) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_search),
-                            contentDescription = "Search",
-                            tint = Color.White
-                        )
-                    }
-                },
+//                actions = {
+//                    IconButton(onClick = {  }) {
+//                        Icon(
+//                            painterResource(id = R.drawable.ic_search),
+//                            contentDescription = "Search",
+//                            tint = Color.White
+//                        )
+//                    }
+//                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF120320)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -111,7 +103,7 @@ fun FavoriteScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,

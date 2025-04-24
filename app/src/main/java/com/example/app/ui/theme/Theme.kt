@@ -8,28 +8,63 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = darkPrimary,
+    onPrimary = darkTextPrimary,
+    primaryContainer = darkPrimaryVariant,
+    onPrimaryContainer = darkTextPrimary,
+
+    secondary = darkSecondary,
+    onSecondary = darkTextPrimary,
+    secondaryContainer = darkSurfaceVariant,
+    onSecondaryContainer = darkTextPrimary,
+
+    tertiary = darkAccent,
+    onTertiary = darkTextPrimary,
+
+    background = darkBackground,
+    onBackground = darkTextPrimary,
+
+    surface = darkSurface,
+    onSurface = darkTextPrimary,
+    surfaceVariant = darkSurfaceVariant,
+    onSurfaceVariant = darkTextSecondary,
+
+    error = ErrorRed,
+    onError = darkTextPrimary,
+
+    outline = darkDivider
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = lightPrimary,
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = lightPrimaryVariant,
+    onPrimaryContainer = Color(0xFFFFFFFF),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = lightSecondary,
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = lightSurfaceVariant,
+    onSecondaryContainer = lightTextPrimary,
+
+    tertiary = lightAccent,
+    onTertiary = Color(0xFFFFFFFF),
+
+    background = lightBackground,
+    onBackground = lightTextPrimary,
+
+    surface = lightSurface,
+    onSurface = lightTextPrimary,
+    surfaceVariant = lightSurfaceVariant,
+    onSurfaceVariant = lightTextSecondary,
+
+    error = ErrorRed,
+    onError = Color(0xFFFFFFFF),
+
+    outline = lightDivider
 )
 
 @Composable

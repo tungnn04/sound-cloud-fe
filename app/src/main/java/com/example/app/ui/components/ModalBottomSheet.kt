@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -49,7 +50,6 @@ import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.PlayList
 import com.example.app.model.Song
-import com.example.app.ui.theme.Purple20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +65,7 @@ fun PlaylistOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = Purple20,
+            containerColor = MaterialTheme.colorScheme.surface,
             scrimColor = Color.Black.copy(alpha = 0.6f),
             content = {
                 Column(
@@ -94,7 +94,8 @@ fun PlaylistOption(
                         Spacer(Modifier.height(16.dp))
                         Text(
                             text = playlist?.name ?: "Unknown playlist",
-                            style = TextStyle(fontSize = 20.sp, color = Color.White),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 16.dp)
@@ -193,7 +194,7 @@ fun SongOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = Purple20,
+            containerColor = MaterialTheme.colorScheme.surface,
             scrimColor = Color.Black.copy(alpha = 0.6f),
             content = {
                 Column(
@@ -225,13 +226,15 @@ fun SongOption(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = song.title ?: "",
-                                    style = TextStyle(color = Color.White, fontSize = 20.sp),
+                                    text = song.title,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                                 Text(
                                     text = song.artistName ?: "Unknown artist",
-                                    style = TextStyle(color = Color.Gray, fontSize = 15.sp)
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -243,7 +246,7 @@ fun SongOption(
                             Icon(
                                 painterResource(id = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline),
                                 contentDescription = "Play song",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
@@ -277,11 +280,12 @@ private fun OptionItem(
             painterResource(id = iconResId),
             contentDescription = text,
             modifier = Modifier.size(24.dp),
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = text,
-            style = TextStyle(fontSize = 15.sp, color = Color.White),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -306,7 +310,7 @@ fun AddPlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = addPlaylistState,
-            containerColor = Purple20,
+            containerColor = MaterialTheme.colorScheme.surface,
             scrimColor = Color.Black.copy(alpha = 0.6f),
             content = {
                 Column(
@@ -318,7 +322,8 @@ fun AddPlaylist(
                 ) {
                     Text(
                         text = "Add to Playlist",
-                        style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     HorizontalDivider(color = Color.Gray , thickness = 1.dp)
@@ -332,14 +337,15 @@ fun AddPlaylist(
                             Icon(
                                 painterResource(id = R.drawable.ic_add_circle),
                                 contentDescription = "Add playlist",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Add New Playlist",
-                            style = TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
@@ -370,7 +376,8 @@ fun AddPlaylist(
                                 Spacer(Modifier.height(16.dp))
                                 Text(
                                     text = playlist.name,
-                                    style = TextStyle(fontSize = 14.sp, color = Color.White),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier
                                         .weight(1f)
                                         .padding(start = 16.dp)
@@ -401,7 +408,7 @@ fun CreatePlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = createState,
-            containerColor = Purple20,
+            containerColor = MaterialTheme.colorScheme.surface,
             scrimColor = Color.Black.copy(alpha = 0.6f),
             content = {
                 Column(
@@ -413,13 +420,16 @@ fun CreatePlaylist(
                 ) {
                     Text(
                         text = "New Playlist",
-                        style = TextStyle(color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    HorizontalDivider(color = Color.Gray , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline , thickness = 1.dp)
                     OutlinedTextField(
                         value = playlistName,
                         onValueChange = { playlistName = it },
-                        placeholder = { Text("My Top 50 Songs", color = Color.Gray) },
+                        placeholder = {
+                            Text("My Top 50 Songs",
+                            style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.outline) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Transparent,

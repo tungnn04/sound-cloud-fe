@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,12 +51,12 @@ fun AppButton(
 
     when (style) {
         ButtonStyle.PRIMARY -> {
-            containerColor = OrangePrimary
-            contentColor = WhiteColor
+            containerColor = MaterialTheme.colorScheme.primary
+            contentColor = MaterialTheme.colorScheme.onPrimary
         }
         ButtonStyle.SECONDARY -> {
-            containerColor = OrangeSecondaryLight
-            contentColor = OrangePrimary
+            containerColor = MaterialTheme.colorScheme.secondary
+            contentColor = MaterialTheme.colorScheme.onSecondary
         }
     }
 
@@ -80,7 +81,10 @@ fun AppButton(
                 )
                 Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
             }
-            Text(text = text)
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -74,8 +75,6 @@ import com.example.app.ui.screens.player.MusicPlayerUiState
 import com.example.app.ui.screens.player.MusicPlayerViewModel
 import com.example.app.ui.screens.playlist.PlaylistDetailScreen
 import com.example.app.ui.screens.playlist.PlaylistScreen
-import com.example.app.ui.theme.Pink20
-import com.example.app.ui.theme.Purple20
 import kotlinx.coroutines.launch
 
 enum class MusicScreen {
@@ -272,7 +271,7 @@ fun BottomNavigation(
         R.drawable.ic_account
     )
 
-    NavigationBar(containerColor = Purple20,
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface,
         modifier = Modifier
             .height(100.dp)
     ) {
@@ -296,7 +295,7 @@ fun BottomNavigation(
                     selectedTextColor = White,
                     unselectedIconColor = Gray,
                     unselectedTextColor = Gray,
-                    indicatorColor = Pink20
+                    indicatorColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -321,7 +320,7 @@ fun MiniPlayerBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp),
-            color = Purple20,
+            color = MaterialTheme.colorScheme.surface,
             tonalElevation = 4.dp,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -381,7 +380,7 @@ fun MiniPlayerBar(
         LinearProgressIndicator(
             progress = { uiState.progress },
             modifier = Modifier.fillMaxWidth(),
-            color = Pink20,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
