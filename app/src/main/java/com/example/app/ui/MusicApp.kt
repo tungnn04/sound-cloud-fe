@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
@@ -120,6 +121,12 @@ fun MusicApp() {
         }
     }
 
+    val handlePlayNextClick: (Int) -> Unit = { songId ->
+        coroutineScope.launch {
+            musicPlayerViewModel.playSongNext(songId)
+        }
+    }
+
     val handlePlayAll: (List<Song>, Boolean) -> Unit = { songs, isShuffle ->
         coroutineScope.launch {
             musicPlayerViewModel.loadPlaylist(songs = if (!isShuffle) songs else songs.shuffled(), startShuffle = isShuffle)
@@ -186,6 +193,7 @@ fun MusicApp() {
             }
             composable(MusicScreen.ACCOUNT.name) {
                 AccountScreen(navController = navController, onPlayClick = handlePlayClick,
+                    onPlayNextClick = handlePlayNextClick,
                     currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(MusicScreen.PLAYLIST.name) {
@@ -193,10 +201,12 @@ fun MusicApp() {
             }
             composable(MusicScreen.FAVORITE.name) {
                 FavoriteScreen(navController = navController, onPlayClick = handlePlayClick,
+                    onPlayNextClick = handlePlayNextClick,
                     onPlayAll = handlePlayAll, currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(MusicScreen.SEARCH.name) {
                 SearchScreen(navController = navController, onPlayClick = handlePlayClick,
+                    onPlayNextClick = handlePlayNextClick,
                     currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(
@@ -210,7 +220,8 @@ fun MusicApp() {
                      onPlayClick = handlePlayClick,
                      onPlayAll = handlePlayAll,
                      currentSong = uiState.currentSong,
-                     isPlaying = uiState.isPlaying
+                     isPlaying = uiState.isPlaying,
+                     onPlayNextClick = handlePlayNextClick,
                  )
             }
             composable(
@@ -222,6 +233,7 @@ fun MusicApp() {
                     navController = navController,
                     artistId = artistId,
                     onPlayClick = handlePlayClick,
+                    onPlayNextClick = handlePlayNextClick,
                     onPlayAll = handlePlayAll,
                     currentSong = uiState.currentSong,
                     isPlaying = uiState.isPlaying
@@ -236,6 +248,7 @@ fun MusicApp() {
                     navController = navController,
                     playlistId = playlistId,
                     onPlayClick = handlePlayClick,
+                    onPlayNextClick = handlePlayNextClick,
                     onPlayAll = handlePlayAll,
                     currentSong = uiState.currentSong,
                     isPlaying = uiState.isPlaying
@@ -246,7 +259,8 @@ fun MusicApp() {
             MusicPlayerScreen(
                 musicPlayerViewModel = musicPlayerViewModel,
                 onMinimize = { isPlayerScreenVisible = false },
-                onPlayClick = handlePlayClick
+                onPlayClick = handlePlayClick,
+                onPlayNextClick = handlePlayNextClick,
             )
         }
     }
@@ -271,7 +285,7 @@ fun BottomNavigation(
         R.drawable.ic_account
     )
 
-    NavigationBar(containerColor = MaterialTheme.colorScheme.surface,
+    NavigationBar(containerColor = MaterialTheme.colorScheme.primaryContainer,
         modifier = Modifier
             .height(100.dp)
     ) {
@@ -291,10 +305,10 @@ fun BottomNavigation(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = White,
-                    selectedTextColor = White,
-                    unselectedIconColor = Gray,
-                    unselectedTextColor = Gray,
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicatorColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -346,14 +360,14 @@ fun MiniPlayerBar(
                         fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = White
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = song.artistName ?: "Unknown Artist",
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = White
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -362,7 +376,7 @@ fun MiniPlayerBar(
                         painterResource(id = if (uiState.isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
                         contentDescription = if (uiState.isPlaying) "Pause" else "Play",
                         modifier = Modifier.size(36.dp),
-                        tint = White
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -371,7 +385,7 @@ fun MiniPlayerBar(
                         painterResource(id = R.drawable.ic_skip_next),
                         contentDescription = "Next",
                         modifier = Modifier.size(36.dp),
-                        tint = White
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }

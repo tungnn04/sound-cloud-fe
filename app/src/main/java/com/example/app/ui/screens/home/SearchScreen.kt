@@ -72,6 +72,7 @@ fun SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
 ) {
@@ -190,7 +191,7 @@ fun SearchScreen(
             SongOptionMenu(
                 song = songClick,
                 onDismissClick = { songClick = null },
-                onPlayNextClick = { },
+                onPlayNextClick = onPlayNextClick,
                 onFavoriteClick = { songId, isFavorite ->
                     searchViewModel.favoriteChange(songId, isFavorite)
                 },

@@ -187,11 +187,11 @@ fun PlaylistScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF120320))) {
+                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
                     Icon(
                         painterResource(id = R.drawable.ic_swap),
                         contentDescription = "Sort",
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(20.dp)
                     )
                 }

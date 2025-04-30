@@ -126,7 +126,7 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 32.dp, end = 48.dp, bottom = 16.dp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(24.dp))
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable { onSearchClick() }
     ) {
@@ -136,10 +136,10 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search Icon",
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Search", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text("Search", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
         }
     }
 }

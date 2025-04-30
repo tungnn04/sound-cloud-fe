@@ -54,6 +54,7 @@ fun AccountScreen(
     navController: NavController,
     accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
 ) {
@@ -89,7 +90,7 @@ fun AccountScreen(
             SongOptionMenu(
                 song = songClick,
                 onDismissClick = { songClick = null },
-                onPlayNextClick = { },
+                onPlayNextClick = onPlayNextClick,
                 onFavoriteClick = { songId, isFavorite ->
                     accountViewModel.favoriteChange(songId, isFavorite)
                 },

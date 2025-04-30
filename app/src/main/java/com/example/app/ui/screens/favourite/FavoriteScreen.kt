@@ -54,6 +54,7 @@ fun FavoriteScreen(
     navController: NavController,
     favoriteViewModel: FavoriteViewModel = viewModel(factory = FavoriteViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
@@ -126,8 +127,8 @@ fun FavoriteScreen(
             SongOptionMenu(
                 song = songClick,
                 onDismissClick = { songClick = null },
-                onPlayNextClick = { },
-                onFavoriteClick = { songId, isFavorite ->
+                onPlayNextClick = onPlayNextClick,
+                onFavoriteClick = { _, _ ->
                     showDeleteFavorite = true
                 },
                 onAddToPlaylist = { songId, playlistId ->
@@ -174,11 +175,11 @@ fun FavoriteScreen(
                             text = numFavoriteText,
                             style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
                         )
-                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF120320))) {
+                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
                             Icon(
                                 painterResource(id = R.drawable.ic_swap),
                                 contentDescription = "Sort",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(20.dp)
                             )
                         }

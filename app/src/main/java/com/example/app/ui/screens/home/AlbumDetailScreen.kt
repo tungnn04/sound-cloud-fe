@@ -53,6 +53,7 @@ fun AlbumDetailScreen(
     albumDetailViewModel: AlbumDetailViewModel = viewModel(factory = AlbumDetailViewModel.factory),
     albumId: Int,
     onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
@@ -78,7 +79,7 @@ fun AlbumDetailScreen(
         SongOptionMenu(
             song = songClick,
             onDismissClick = { songClick = null },
-            onPlayNextClick = { },
+            onPlayNextClick = onPlayNextClick,
             onFavoriteClick = { songId, isFavorite ->
                 albumDetailViewModel.favoriteChange(songId, isFavorite)
             },
@@ -96,12 +97,12 @@ fun AlbumDetailScreen(
             onActionClick = { },
             navigationIcon = R.drawable.ic_back,
             actionIcon = R.drawable.ic_dots_vertical,
-            color = Color(0xFF120320)
+            color = MaterialTheme.colorScheme.background
         )
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

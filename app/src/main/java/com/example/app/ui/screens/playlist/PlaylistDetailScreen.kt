@@ -53,6 +53,7 @@ fun PlaylistDetailScreen(
     navController: NavController,
     playlistDetailViewModel: PlaylistDetailViewModel = viewModel(factory = PlaylistDetailViewModel.factory),
     onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
@@ -117,7 +118,7 @@ fun PlaylistDetailScreen(
         SongOptionMenu(
             song = songClick,
             onDismissClick = { songClick = null },
-            onPlayNextClick = { },
+            onPlayNextClick = onPlayNextClick,
             onFavoriteClick = { songId, isFavorite ->
                 playlistDetailViewModel.favoriteChange(songId, isFavorite)
             },

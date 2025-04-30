@@ -1,6 +1,5 @@
 package com.example.app.ui.components
 
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
@@ -27,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
@@ -65,8 +60,8 @@ fun PlaylistOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrimColor = Color.Black.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -101,7 +96,7 @@ fun PlaylistOption(
                                 .padding(start = 16.dp)
                         )
                     }
-                    HorizontalDivider(color = Color.Gray , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
                     OptionItem(R.drawable.ic_edit, "Edit playlist", onEdit)
                     OptionItem(R.drawable.ic_delete, "Delete playlist", onDelete)
                 }
@@ -116,7 +111,7 @@ fun SongOptionMenu(
     onCreatePlaylist: (String) -> Unit,
     onAddToPlaylist: (Int, Int) -> Unit,
     onDismissClick: () -> Unit,
-    onPlayNextClick: () -> Unit,
+    onPlayNextClick: (Int) -> Unit,
     onFavoriteClick: (Int, Boolean) -> Unit,
     playlists: List<PlayList>
 ) {
@@ -146,7 +141,7 @@ fun SongOptionMenu(
                 showSongOption = false
             },
             onPlayNextClick = {
-                onPlayNextClick()
+                onPlayNextClick(song.id)
                 showSongOption = false
             },
             onFavoriteClick = onFavoriteClick,
@@ -194,8 +189,8 @@ fun SongOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrimColor = Color.Black.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -310,8 +305,8 @@ fun AddPlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = addPlaylistState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrimColor = Color.Black.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -408,8 +403,8 @@ fun CreatePlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = createState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrimColor = Color.Black.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier

@@ -26,7 +26,8 @@ import com.example.app.ui.components.TopBar
 fun MusicPlayerScreen(
     musicPlayerViewModel: MusicPlayerViewModel,
     onMinimize: () -> Unit,
-    onPlayClick: (Int) -> Unit
+    onPlayClick: (Int) -> Unit,
+    onPlayNextClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val uiState by musicPlayerViewModel.uiState.collectAsState()
@@ -43,7 +44,7 @@ fun MusicPlayerScreen(
         SongOptionMenu(
             song = songClick,
             onDismissClick = { songClick = null },
-            onPlayNextClick = { },
+            onPlayNextClick = onPlayNextClick ,
             onFavoriteClick = { songId, isFavorite ->
                 musicPlayerViewModel.favoriteChange(songId, isFavorite)
             },
@@ -64,7 +65,7 @@ fun MusicPlayerScreen(
             },
             navigationIcon = R.drawable.ic_chevron_down,
             actionIcon = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline,
-            color = Color(0xFF120320),
+            color = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp)
@@ -72,7 +73,7 @@ fun MusicPlayerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF120320))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -99,7 +100,7 @@ fun MusicPlayerScreen(
             Text(
                 text = uiState.currentSong?.title ?: "---",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -107,7 +108,7 @@ fun MusicPlayerScreen(
             Text(
                 text = uiState.currentSong?.artistName ?: "---",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -137,8 +138,8 @@ fun MusicPlayerScreen(
                         .padding(horizontal = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(uiState.currentTimeFormatted, style = MaterialTheme.typography.labelSmall, color = Color.LightGray)
-                    Text(uiState.totalTimeFormatted, style = MaterialTheme.typography.labelSmall, color = Color.LightGray)
+                    Text(uiState.currentTimeFormatted, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface)
+                    Text(uiState.totalTimeFormatted, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 
@@ -193,21 +194,21 @@ fun PlayerControls(
             Icon(
                 painterResource(id = R.drawable.ic_shuffle),
                 contentDescription = "Shuffle",
-                tint = if (isShuffle) MaterialTheme.colorScheme.onPrimary else Color.White
+                tint = if (isShuffle) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
         }
         IconButton(onClick = onPreviousClick, modifier = Modifier.size(48.dp)) {
             Icon(
                 painterResource(id = R.drawable.ic_skip_previous),
                 contentDescription = "Previous",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         IconButton(onClick = onPlayPauseClick, modifier = Modifier.size(64.dp)) {
             Icon(
                 painterResource(id = if (isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
                 contentDescription = if (isPlaying) "Pause" else "Play",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -215,7 +216,7 @@ fun PlayerControls(
             Icon(
                 painterResource(id = R.drawable.ic_skip_next),
                 contentDescription = "Next",
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         IconButton(onClick = onRepeatClick, modifier = Modifier.size(48.dp)) {
@@ -223,17 +224,17 @@ fun PlayerControls(
                 0 -> Icon(
                     painterResource(id = R.drawable.ic_repeat),
                     contentDescription = "Repeat",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 1 -> Icon(
                     painterResource(id = R.drawable.ic_repeat_once),
                     contentDescription = "Repeat",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 2 -> Icon(
                     painterResource(id = R.drawable.ic_repeat),
                     contentDescription = "Repeat",
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
