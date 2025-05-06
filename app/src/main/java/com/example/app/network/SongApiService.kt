@@ -9,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -25,15 +26,15 @@ interface SongApiService {
         @Body request: SearchSong
     ): Response<ApiResponse<List<Song>>>
 
+    @Multipart
     @POST("songs/create")
     suspend fun create(
         @Part("title") title: RequestBody,
         @Part("artistId") artistId: RequestBody?,
         @Part("albumId") albumId: RequestBody?,
         @Part("categoryId") categoryId: RequestBody?,
-        @Part("duration") duration: RequestBody?,
-        @Part("audio") audio: MultipartBody.Part,
-        @Part("coverImage") coverImage: MultipartBody.Part
+        @Part audio: MultipartBody.Part,
+        @Part coverImage: MultipartBody.Part
     ): Response<ApiResponse<Unit>>
 
     @DELETE("songs/delete/{id}")

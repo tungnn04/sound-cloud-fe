@@ -62,6 +62,8 @@ import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
 import com.example.app.ui.screens.account.AccountScreen
+import com.example.app.ui.screens.account.EditProfileScreen
+import com.example.app.ui.screens.account.UploadSongScreen
 import com.example.app.ui.screens.auth.ForgotPasswordScreen
 import com.example.app.ui.screens.home.HomeScreen
 import com.example.app.ui.screens.auth.LoginScreen
@@ -90,7 +92,9 @@ enum class MusicScreen {
     SEARCH,
     ALBUM_DETAIL,
     ARTIST_DETAIL,
-    PLAYLIST_DETAIL
+    PLAYLIST_DETAIL,
+    UPLOAD_SONG,
+    EDIT_PROFILE,
 }
 
 @Composable
@@ -253,6 +257,12 @@ fun MusicApp() {
                     currentSong = uiState.currentSong,
                     isPlaying = uiState.isPlaying
                 )
+            }
+            composable(MusicScreen.UPLOAD_SONG.name) {
+                UploadSongScreen(navController = navController)
+            }
+            composable(MusicScreen.EDIT_PROFILE.name) {
+                EditProfileScreen(navController = navController)
             }
         }
         if (isPlayerScreenVisible) {

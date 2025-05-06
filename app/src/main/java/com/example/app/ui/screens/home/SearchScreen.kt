@@ -120,7 +120,7 @@ fun SearchScreen(
                     placeholder = {
                         Text("Search" ,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                            color = MaterialTheme.colorScheme.onSecondaryContainer) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -137,7 +137,7 @@ fun SearchScreen(
                                 Icon(
                                     painterResource(id = R.drawable.ic_close),
                                     contentDescription = "Clear",
-                                    tint = Color.White
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                         }
@@ -150,13 +150,13 @@ fun SearchScreen(
                         )
                     },
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF311947),
-                        unfocusedContainerColor = Color(0xFF311947),
-                        focusedIndicatorColor = Color(0xFF311947),
-                        unfocusedIndicatorColor = Color(0xFF311947),
-                        cursorColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
+                        focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                        cursorColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
                     modifier = Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(24.dp))

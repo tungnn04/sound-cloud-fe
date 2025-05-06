@@ -30,14 +30,6 @@ enum class ButtonStyle {
     SECONDARY
 }
 
-val OrangePrimary = Color(0xFFFFA500)
-val OrangeSecondaryLight = Color(0xFFFFE0B2)
-val WhiteColor = Color.White
-val DisabledPrimaryContainer = OrangePrimary.copy(alpha = 0.5f)
-val DisabledSecondaryContainer = OrangeSecondaryLight.copy(alpha = 0.5f)
-val DisabledPrimaryContent = WhiteColor.copy(alpha = 0.7f)
-val DisabledSecondaryContent = OrangePrimary.copy(alpha = 0.7f)
-
 @Composable
 fun AppButton(
     text: String,

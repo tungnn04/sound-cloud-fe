@@ -23,7 +23,6 @@ interface SongRepository {
         artistId: Int?,
         albumId: Int?,
         categoryId: Int?,
-        duration: Int?,
         audio: Pair<File, String>,
         coverImage: Pair<File, String>
     ): Response<ApiResponse<Unit>>
@@ -49,7 +48,6 @@ class SongRepositoryImpl(
         artistId: Int?,
         albumId: Int?,
         categoryId: Int?,
-        duration: Int?,
         audio: Pair<File, String>,
         coverImage: Pair<File, String>
     ): Response<ApiResponse<Unit>> =
@@ -58,7 +56,6 @@ class SongRepositoryImpl(
             artistId = artistId?.toString()?.toRequestBody("text/plain".toMediaType()),
             albumId = albumId?.toString()?.toRequestBody("text/plain".toMediaType()),
             categoryId = categoryId?.toString()?.toRequestBody("text/plain".toMediaType()),
-            duration = duration?.toString()?.toRequestBody("text/plain".toMediaType()),
             audio = MultipartBody.Part.createFormData(
                 "audio", audio.first.name, audio.first.asRequestBody(audio.second.toMediaType())
             ),

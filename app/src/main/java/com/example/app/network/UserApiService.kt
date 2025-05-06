@@ -19,7 +19,7 @@ interface UserApiService {
     @POST("users/update")
     suspend fun updateUser(
         @Part("fullName") fullName: RequestBody,
-        @Part("avatarImage") avatarImage: MultipartBody.Part?
+        @Part avatarImage: MultipartBody.Part?
     ): Response<ApiResponse<Unit>>
 
     @GET("users/getUpload")

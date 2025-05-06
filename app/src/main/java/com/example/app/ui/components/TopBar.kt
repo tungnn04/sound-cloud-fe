@@ -15,9 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun TopBar (
@@ -25,7 +23,7 @@ fun TopBar (
     onNavigationClick: () -> Unit,
     onActionClick: () -> Unit,
     @DrawableRes navigationIcon: Int,
-    @DrawableRes actionIcon: Int,
+    @DrawableRes actionIcon: Int?,
     color: Color,
     modifier: Modifier = Modifier
 ) {
@@ -46,12 +44,15 @@ fun TopBar (
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        IconButton(onClick = onActionClick) {
-            Icon(
-                painterResource(id = actionIcon),
-                contentDescription = "Action",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+        if (actionIcon != null) {
+            IconButton(onClick = onActionClick) {
+                Icon(
+                    painterResource(id = actionIcon),
+                    contentDescription = "Action",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+
     }
 }

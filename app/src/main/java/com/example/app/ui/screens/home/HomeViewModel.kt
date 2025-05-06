@@ -40,7 +40,7 @@ class HomeViewModel(
         val albumResponse = albumRepository.search(0,5, SearchAlbum())
         val artistResponse = artistRepository.search(0,5, SearchArtist())
 
-        if (userResponse.isSuccessful) {
+        if (userResponse.isSuccessful && songResponse.isSuccessful && categoryResponse.isSuccessful && albumResponse.isSuccessful && artistResponse.isSuccessful) {
             _uiState.value = _uiState.value.copy(user = userResponse.body()?.data ?: throw Exception("User not found"))
             _uiState.value = _uiState.value.copy(listSong = songResponse.body()?.data ?: emptyList())
             _uiState.value = _uiState.value.copy(listAlbum = albumResponse.body()?.data ?: emptyList())
