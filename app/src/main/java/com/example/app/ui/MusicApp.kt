@@ -1,6 +1,10 @@
 package com.example.app.ui
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,9 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -61,6 +63,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
+import com.example.app.service.PlaybackService
 import com.example.app.ui.screens.account.AccountScreen
 import com.example.app.ui.screens.account.EditProfileScreen
 import com.example.app.ui.screens.account.UploadSongScreen
@@ -97,6 +100,7 @@ enum class MusicScreen {
     EDIT_PROFILE,
 }
 
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun MusicApp() {
     val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.factory)
@@ -116,6 +120,15 @@ fun MusicApp() {
     val imeVisible by remember {
         derivedStateOf {
             imeInsets.getBottom(density) > 0
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = Intent(context, PlaybackService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(context, intent)
+        } else {
+            context.startService(intent)
         }
     }
 
@@ -343,7 +356,8 @@ fun MiniPlayerBar(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
+                .height(64.dp)
+                .clickable { onBarClick() },
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 4.dp,
         ) {
@@ -358,12 +372,11 @@ fun MiniPlayerBar(
                     modifier = Modifier.padding(start = 8.dp)
                         .size(48.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable { onBarClick() }
                )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column(modifier = Modifier.weight(1f).clickable { onBarClick() }) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = song.title,
                         fontWeight = FontWeight.Medium,

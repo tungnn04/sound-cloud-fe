@@ -1,10 +1,14 @@
-package com.example.app.ui.screens.player // Hoặc package ViewModel của bạn
+package com.example.app.ui.screens.player
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.ComponentName
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -15,13 +19,17 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.example.app.MusicApplication
 import com.example.app.data.FavoriteRepository
 import com.example.app.data.PlaylistRepository
 import com.example.app.data.SongRepository
 import com.example.app.model.PlayList
 import com.example.app.model.Song
+import com.example.app.service.PlaybackService
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,14 +80,13 @@ class MusicPlayerViewModel(
     private val _uiState = MutableStateFlow(MusicPlayerUiState())
     val uiState: StateFlow<MusicPlayerUiState> = _uiState.asStateFlow()
 
-    private val exoPlayer: ExoPlayer = ExoPlayer.Builder(application).build()
     private var progressUpdateJob: Job? = null
+    private var mediaController: MediaController? = null
+    private var controllerFuture: ListenableFuture<MediaController>? = null
+    private var isServiceStarted = false
 
     init {
-        exoPlayer.shuffleModeEnabled = _uiState.value.isShuffleEnabled
-        exoPlayer.repeatMode = _uiState.value.repeatMode
-
-        setupPlayerListener()
+        initializeMediaController()
         viewModelScope.launch {
             val res = playlistRepository.findAll();
             if (res.isSuccessful) {
@@ -88,8 +95,52 @@ class MusicPlayerViewModel(
         }
     }
 
-    private fun setupPlayerListener() {
-        exoPlayer.addListener(object : Player.Listener {
+    private fun initializeMediaController() {
+        val intent = Intent(application, PlaybackService::class.java)
+        application.startService(intent)
+
+        val sessionToken = SessionToken(application, ComponentName(application, PlaybackService::class.java))
+
+        controllerFuture = MediaController.Builder(application,sessionToken).buildAsync()
+        controllerFuture?.addListener({
+            mediaController = controllerFuture?.get()
+            mediaController?.let { controller ->
+                setupPlayerListener(controller)
+                _uiState.update {
+                    it.copy(
+                        isPlaying = controller.isPlaying,
+                        isShuffleEnabled = controller.shuffleModeEnabled,
+                        repeatMode = controller.repeatMode,
+                        durationMs = controller.duration.coerceAtLeast(0),
+                        isLoading = controller.playbackState == Player.STATE_BUFFERING
+                    )
+                }
+                if (controller.isPlaying) {
+                    startProgressUpdates()
+                }
+            }
+
+        }, MoreExecutors.directExecutor())
+    }
+
+    private fun ensureServiceStarted() {
+        if (!isServiceStarted) {
+            Log.d("MusicPlayerViewModel", "Service not started by this VM instance. Starting now.")
+            val intent = Intent(application.applicationContext, PlaybackService::class.java)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(application.applicationContext, intent)
+            } else {
+                application.applicationContext.startService(intent)
+            }
+            isServiceStarted = true
+        } else {
+            Log.d("MusicPlayerViewModel", "Service already marked as started by this VM instance.")
+        }
+    }
+
+    private fun setupPlayerListener(player: Player) {
+        player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlayingUpdate: Boolean) {
                 Log.d("MusicPlayerVM_Listener", "[CALLBACK] onIsPlayingChanged: isPlaying = $isPlayingUpdate")
                 _uiState.update { it.copy(isPlaying = isPlayingUpdate) }
@@ -108,7 +159,7 @@ class MusicPlayerViewModel(
 
                 if (playbackState == Player.STATE_READY || playbackState == Player.STATE_ENDED) {
                     Log.d("MusicPlayerVM_Listener", "   -> State is Ready or Ended. Duration =  ms")
-                    _uiState.update { it.copy(durationMs = exoPlayer.duration.coerceAtLeast(0)) }
+                    _uiState.update { it.copy(durationMs = player.duration.coerceAtLeast(0)) }
                 }
                 if (playbackState == Player.STATE_ENDED) {
                     stopProgressUpdates()
@@ -119,12 +170,12 @@ class MusicPlayerViewModel(
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
 
                 val newPlayingId = mediaItem?.mediaId?.toIntOrNull()
-                val newSong = _uiState.value.playlist.find { it?.id == newPlayingId }
+                val newSong = _uiState.value.playlist.find { it.id == newPlayingId }
                 _uiState.update {
                     it.copy(
                         currentSong = newSong,
                         currentPositionMs = 0L,
-                        durationMs = exoPlayer.duration.coerceAtLeast(0),
+                        durationMs = player.duration.coerceAtLeast(0),
                         isLoading = false
                     )
                 }
@@ -163,7 +214,7 @@ class MusicPlayerViewModel(
     fun toggleShuffle() {
         val currentShuffleState = _uiState.value.isShuffleEnabled
         val newShuffleState = !currentShuffleState
-        exoPlayer.shuffleModeEnabled = newShuffleState
+        mediaController?.shuffleModeEnabled = newShuffleState
         Log.d("MusicPlayerVM", "Toggled shuffle mode to: $newShuffleState")
     }
 
@@ -175,7 +226,7 @@ class MusicPlayerViewModel(
             Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
             else -> Player.REPEAT_MODE_OFF
         }
-        exoPlayer.repeatMode = nextMode
+        mediaController?.repeatMode = nextMode
         Log.d("MusicPlayerVM", "Cycled repeat mode to: $nextMode")
     }
 
@@ -208,6 +259,7 @@ class MusicPlayerViewModel(
     }
 
     fun loadPlaylist(songs: List<Song>, startShuffle: Boolean = false) {
+        ensureServiceStarted()
         if (songs.isEmpty()) {
             _uiState.update { it.copy(isLoading = false, error = "Playlist is empty") }
             return
@@ -216,10 +268,10 @@ class MusicPlayerViewModel(
         val mediaItems = songs.map { song ->
             song.toMediaItem()
         }
-        exoPlayer.shuffleModeEnabled = startShuffle
-        exoPlayer.setMediaItems(mediaItems, /* resetPosition= */ true)
-        exoPlayer.prepare()
-        exoPlayer.play()
+        mediaController?.shuffleModeEnabled = startShuffle
+        mediaController?.setMediaItems(mediaItems, /* resetPosition= */ true)
+        mediaController?.prepare()
+        mediaController?.play()
     }
 
     private fun Song.toMediaItem(): MediaItem {
@@ -255,12 +307,13 @@ class MusicPlayerViewModel(
     }
 
     suspend fun playSongImmediately(id: Int) {
+        ensureServiceStarted()
         val song = loadSong(id)
         val songMediaId = song?.id.toString()
         var foundIndex = -1
 
-        for (i in 0 until exoPlayer.mediaItemCount) {
-            if (exoPlayer.getMediaItemAt(i).mediaId == songMediaId) {
+        for (i in 0 until mediaController!!.mediaItemCount) {
+            if (mediaController!!.getMediaItemAt(i).mediaId == songMediaId) {
                 foundIndex = i
                 break
             }
@@ -268,57 +321,61 @@ class MusicPlayerViewModel(
 
         if (foundIndex != -1) {
 
-            if (exoPlayer.currentMediaItemIndex == foundIndex && exoPlayer.isPlaying) {
+            if (mediaController?.currentMediaItemIndex == foundIndex && mediaController!!.isPlaying) {
                 Log.d("MusicPlayerVM", "Song is already the current playing item.")
             } else {
-                exoPlayer.seekTo(foundIndex, 0)
-                exoPlayer.playWhenReady = true
-                if(exoPlayer.playbackState == Player.STATE_IDLE) exoPlayer.prepare()
-                exoPlayer.play()
+                mediaController?.seekTo(foundIndex, 0)
+                mediaController?.playWhenReady = true
+                if (mediaController?.playbackState == Player.STATE_IDLE) mediaController?.prepare()
+                mediaController?.play()
             }
         } else {
-            Log.d("MusicPlayerVM", "Song not found in current queue. Setting as new playlist.")
+            Log.d(
+                "MusicPlayerVM",
+                "Song not found in current queue. Setting as new playlist."
+            )
             val newMediaItem = song?.toMediaItem()
             _uiState.update { it.copy(playlist = listOf(song!!)) }
-            newMediaItem?.let { exoPlayer.setMediaItem(it) }
-            exoPlayer.playWhenReady = true
+            newMediaItem?.let { mediaController?.setMediaItem(it) }
+            mediaController?.playWhenReady = true
             Log.d("MusicPlayerVM", "Calling prepare() for new playlist.")
-            exoPlayer.prepare()
+            mediaController?.prepare()
             Log.d("MusicPlayerVM", "Called prepare() for new playlist.")
-            exoPlayer.play()
+            mediaController?.play()
         }
 
         _uiState.update { it.copy(currentSong = song) }
         // Xóa lỗi nếu có
         if (_uiState.value.error != null) _uiState.update { it.copy(error = null) }
+
     }
 
     suspend fun playSongNext(id: Int) {
-        val currentMediaItemIndex = exoPlayer.currentMediaItemIndex
-        val mediaItemCount = exoPlayer.mediaItemCount
+        val currentMediaItemIndex = mediaController?.currentMediaItemIndex
+        val mediaItemCount = mediaController?.mediaItemCount
         val songMediaId = id.toString()
 
         if (currentMediaItemIndex == -1 || mediaItemCount == 0) {
             Log.d("MusicPlayerVM", "PlayNext: No current item or empty queue, playing immediately instead.")
-            playSongImmediately(id)
+            playSongImmediately(id = id)
             return
         }
 
         Log.d("MusicPlayerVM", "PlayNext: Processing song ID $id. Current index: $currentMediaItemIndex, Count: $mediaItemCount")
         _uiState.update { it.copy(isLoading = true, error = null) }
 
-        val song = loadSong(id)
+        val song = this.loadSong(id = id)
         if (song == null) {
             Log.e("MusicPlayerVM", "PlayNext: Failed to load song $id.")
             _uiState.update { it.copy(isLoading = false) }
             return
         }
 
-        val insertIndex = currentMediaItemIndex + 1
+        val insertIndex = currentMediaItemIndex?.plus(1)
 
         var existingIndex = -1
-        for (i in 0 until mediaItemCount) {
-            if (exoPlayer.getMediaItemAt(i).mediaId == songMediaId) {
+        for (i in 0 until mediaItemCount!!) {
+            if (mediaController?.getMediaItemAt(i)?.mediaId == songMediaId) {
                 existingIndex = i
                 break
             }
@@ -339,7 +396,9 @@ class MusicPlayerViewModel(
                     }
                     else -> {
                         Log.d("MusicPlayerVM", "PlayNext: Moving song $id from index $existingIndex to $insertIndex.")
-                        exoPlayer.moveMediaItem(existingIndex, insertIndex)
+                        if (insertIndex != null) {
+                            mediaController?.moveMediaItem(existingIndex, insertIndex)
+                        }
 
                         _uiState.update { currentState ->
                             val currentPlaylist = currentState.playlist.filterNotNull().toMutableList()
@@ -348,8 +407,10 @@ class MusicPlayerViewModel(
                                 val actualExistingIndex = currentPlaylist.indexOfFirst{ it.id == id}
                                 if(actualExistingIndex != -1) {
                                     currentPlaylist.removeAt(actualExistingIndex)
-                                    val actualInsertIndex = insertIndex.coerceAtMost(currentPlaylist.size)
-                                    currentPlaylist.add(actualInsertIndex, itemToMove)
+                                    val actualInsertIndex = insertIndex?.coerceAtMost(currentPlaylist.size)
+                                    if (actualInsertIndex != null) {
+                                        currentPlaylist.add(actualInsertIndex, itemToMove)
+                                    }
                                 }
                             }
                             currentState.copy(playlist = currentPlaylist)
@@ -361,12 +422,14 @@ class MusicPlayerViewModel(
                 Log.d("MusicPlayerVM", "PlayNext: Song $id not found in queue. Adding at index $insertIndex.")
                 val newMediaItem = song.toMediaItem()
 
-                exoPlayer.addMediaItem(insertIndex, newMediaItem)
+                mediaController?.addMediaItem(insertIndex!!, newMediaItem)
 
                 _uiState.update { currentState ->
                     val currentPlaylist = currentState.playlist.toMutableList()
-                    val actualInsertIndex = insertIndex.coerceAtMost(currentPlaylist.size)
-                    currentPlaylist.add(actualInsertIndex, song)
+                    val actualInsertIndex = insertIndex?.coerceAtMost(currentPlaylist.size)
+                    if (actualInsertIndex != null) {
+                        currentPlaylist.add(actualInsertIndex, song)
+                    }
                     currentState.copy(playlist = currentPlaylist)
                 }
                 Toast.makeText(application, "Added ${song.title} to play next", Toast.LENGTH_SHORT).show()
@@ -381,15 +444,15 @@ class MusicPlayerViewModel(
 
     fun playPause() {
         if (_uiState.value.currentSong == null && _uiState.value.playlist.isNotEmpty()) {
-            exoPlayer.seekToDefaultPosition(0)
-            exoPlayer.play()
-        } else if (exoPlayer.isPlaying) {
-            exoPlayer.pause()
+            mediaController?.seekToDefaultPosition(0)
+            mediaController?.play()
+        } else if (mediaController?.isPlaying!!) {
+            mediaController?.pause()
         } else {
-            if (exoPlayer.playbackState == Player.STATE_ENDED) {
-                exoPlayer.seekTo(0)
+            if (mediaController?.playbackState == Player.STATE_ENDED) {
+                mediaController?.seekTo(0)
             }
-            exoPlayer.play()
+                mediaController?.play()
         }
         if (_uiState.value.error != null) {
             _uiState.update { it.copy(error = null) }
@@ -397,27 +460,27 @@ class MusicPlayerViewModel(
     }
 
     fun seekToNext() {
-        if (exoPlayer.hasNextMediaItem()) {
-            exoPlayer.seekToNextMediaItem()
-            if (!exoPlayer.isPlaying) exoPlayer.play()
+        if (mediaController!!.hasNextMediaItem()) {
+            mediaController?.seekToNextMediaItem()
+            if (!mediaController!!.isPlaying) mediaController?.play()
         }
     }
 
     fun seekToPrevious() {
-        if (exoPlayer.hasPreviousMediaItem()) {
-            exoPlayer.seekToPreviousMediaItem()
-            if (!exoPlayer.isPlaying) exoPlayer.play()
+        if (mediaController!!.hasPreviousMediaItem()) {
+            mediaController?.seekToPreviousMediaItem()
+            if (!mediaController!!.isPlaying) mediaController?.play()
         } else {
-            exoPlayer.seekTo(0)
-            if (!exoPlayer.isPlaying) exoPlayer.play()
+            mediaController?.seekTo(0)
+            if (!mediaController!!.isPlaying) mediaController?.play()
         }
     }
 
     fun seekToPosition(positionMs: Long) {
         stopProgressUpdates()
-        val targetPosition = positionMs.coerceIn(0, exoPlayer.duration)
+        val targetPosition = positionMs.coerceIn(0, mediaController?.duration)
         _uiState.update { it.copy(currentPositionMs = targetPosition) }
-        exoPlayer.seekTo(targetPosition)
+        mediaController?.seekTo(targetPosition)
         if (_uiState.value.isPlaying) {
             startProgressUpdates()
         }
@@ -427,8 +490,8 @@ class MusicPlayerViewModel(
         stopProgressUpdates()
         progressUpdateJob = viewModelScope.launch {
             while (true) {
-                if (exoPlayer.isPlaying) {
-                    val currentPosition = exoPlayer.currentPosition.coerceAtLeast(0L)
+                if (mediaController!!.isPlaying) {
+                    val currentPosition = mediaController!!.currentPosition.coerceAtLeast(0L)
                     if (_uiState.value.currentPositionMs != currentPosition) {
                         _uiState.update { it.copy(currentPositionMs = currentPosition) }
                     }
@@ -448,7 +511,9 @@ class MusicPlayerViewModel(
     override fun onCleared() {
         super.onCleared()
         stopProgressUpdates()
-        exoPlayer.release()
+        controllerFuture?.let { future ->
+            MediaController.releaseFuture(future)
+        }
     }
 
     companion object {

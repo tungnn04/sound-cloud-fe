@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
 import com.example.app.data.FavoriteRepository
 import com.example.app.data.PlaylistRepository
-import com.example.app.data.SongRepository
+import com.example.app.data.UserPreferencesRepository
 import com.example.app.data.UserRepository
 import com.example.app.model.PlayList
 import com.example.app.model.Song
@@ -20,9 +20,9 @@ import java.io.File
 
 class AccountViewModel(
     private val userRepository: UserRepository,
-    private val songRepository: SongRepository,
     private val playlistRepository: PlaylistRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AccountUiState())
     val uiState = _uiState.asStateFlow()
@@ -42,8 +42,10 @@ class AccountViewModel(
         }
     }
 
-    suspend fun uploadSong() {
-
+    fun logout() {
+        viewModelScope.launch {
+            userPreferencesRepository.clearTokenPreference()
+        }
     }
 
     fun createPlaylist(name: String) {
@@ -86,10 +88,10 @@ class AccountViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as MusicApplication)
                 val userRepository = application.container.userRepository
-                val songRepository = application.container.songRepository
                 val playlistRepository = application.container.playlistRepository
                 val favoriteRepository = application.container.favoriteRepository
-                AccountViewModel(userRepository, songRepository, playlistRepository, favoriteRepository)
+                val userPreferencesRepository = application.container.userPreferencesRepository
+                AccountViewModel(userRepository, playlistRepository, favoriteRepository, userPreferencesRepository)
             }
         }
     }

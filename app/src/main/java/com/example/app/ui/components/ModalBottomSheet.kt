@@ -1,5 +1,6 @@
 package com.example.app.ui.components
 
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
@@ -394,12 +395,9 @@ fun CreatePlaylist(
     onCreatePlaylist: (String) -> Unit,
     onDone: () -> Unit,
 ) {
-    val createState = rememberModalBottomSheetState()
-    var playlistName by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-
     if (showCreatePlaylist) {
+        val createState = rememberModalBottomSheetState()
+        var playlistName by remember { mutableStateOf("") }
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = createState,
@@ -418,47 +416,129 @@ fun CreatePlaylist(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
                     OutlinedTextField(
                         value = playlistName,
                         onValueChange = { playlistName = it },
                         placeholder = {
                             Text("My Top 50 Songs",
-                            style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.outline) },
+                            style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedContainerColor = Color(0xFFF0F0F0),
-                            unfocusedContainerColor = Color(0xFFF0F0F0),
-                            cursorColor = Color.Black,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black,
-                            focusedPlaceholderColor = Color.Gray,
-                            unfocusedPlaceholderColor = Color.Gray
+                            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+//                            focusedContainerColor = Color(0xFFF0F0F0),
+//                            unfocusedContainerColor = Color(0xFFF0F0F0),
+                            cursorColor = MaterialTheme.colorScheme.onSurface,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
                         ),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    HorizontalDivider(color = Color.Gray , thickness = 1.dp)
+//                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         AppButton("Cancel",
                             onClick = {
                                 onDone()
                                 playlistName = ""
                             },
-                            style = ButtonStyle.SECONDARY
+                            style = ButtonStyle.SECONDARY,
+                            modifier = Modifier.weight(1f)
                         )
+                        Spacer(modifier = Modifier.width(16.dp))
                         AppButton("Create" ,
                             onClick = {
                                 onDone()
                                 onCreatePlaylist(playlistName)
                                 playlistName = ""
                             },
-                            style = ButtonStyle.PRIMARY)
+                            style = ButtonStyle.PRIMARY,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditPlaylist(
+    showEditPlaylist: Boolean,
+    onDismissClick: () -> Unit,
+    onEditPlaylist: (String) -> Unit,
+    name: String,
+    onDone: () -> Unit,
+) {
+    if (showEditPlaylist) {
+        val editState = rememberModalBottomSheetState()
+        var playlistName by remember { mutableStateOf(name) }
+        ModalBottomSheet(
+            onDismissRequest = onDismissClick,
+            sheetState = editState,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Edit Playlist",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
+                    OutlinedTextField(
+                        value = playlistName,
+                        onValueChange = { playlistName = it },
+                        placeholder = {
+                            Text("Playlist name",
+                                style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+//                            focusedContainerColor = Color(0xFFF0F0F0),
+//                            unfocusedContainerColor = Color(0xFFF0F0F0),
+                            cursorColor = MaterialTheme.colorScheme.onSurface,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+//                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        AppButton("Cancel",
+                            onClick = {
+                                onDone()
+                            },
+                            style = ButtonStyle.SECONDARY,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        AppButton("Update" ,
+                            onClick = {
+                                onDone()
+                                onEditPlaylist(playlistName)
+                            },
+                            style = ButtonStyle.PRIMARY,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }

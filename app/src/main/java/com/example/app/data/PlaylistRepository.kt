@@ -1,8 +1,8 @@
 package com.example.app.data
 
 import com.example.app.model.ApiResponse
-import com.example.app.model.CreatePlaylist
 import com.example.app.model.PlayList
+import com.example.app.model.PlaylistRequest
 import com.example.app.network.PlaylistApiService
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -20,7 +20,6 @@ interface PlaylistRepository {
     suspend fun updatePlaylist(
         id: Int,
         name: String,
-        coverImage: Pair<File, String>
     ): Response<ApiResponse<Unit>>
     suspend fun deletePlaylist(id: Int): Response<ApiResponse<Unit>>
     suspend fun addSong(
@@ -43,19 +42,15 @@ class PlaylistRepositoryImpl(
         playlistApiService.detail(id)
 
     override suspend fun createPlaylist(name: String): Response<ApiResponse<Unit>> =
-        playlistApiService.createPlaylist(CreatePlaylist(name))
+        playlistApiService.createPlaylist(PlaylistRequest(name))
 
     override suspend fun updatePlaylist(
         id: Int,
         name: String,
-        coverImage: Pair<File, String>
     ): Response<ApiResponse<Unit>> =
         playlistApiService.updatePlaylist(
             id,
-            name = name.toRequestBody("text/plain".toMediaType()),
-            coverImage = MultipartBody.Part.createFormData(
-                "coverImage", coverImage.first.name, coverImage.first.asRequestBody(coverImage.second.toMediaType())
-            )
+            PlaylistRequest(name)
         )
 
     override suspend fun deletePlaylist(id: Int): Response<ApiResponse<Unit>> =

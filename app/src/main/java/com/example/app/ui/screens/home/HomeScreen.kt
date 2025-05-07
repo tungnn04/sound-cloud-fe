@@ -172,7 +172,6 @@ fun <T> HorizontalItemList(items: List<T>, itemContent: @Composable (T) -> Unit)
 private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onPlayClick(song.id) }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -184,6 +183,7 @@ private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
             modifier = Modifier
                 .size(120.dp)
                 .clip(RoundedCornerShape(12.dp))
+                .clickable { onPlayClick(song.id) }
         )
         Text(
             text = song.title,
@@ -197,8 +197,7 @@ private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
 @Composable
 private fun AlbumItem(album: Album, navController: NavController) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { navController.navigate("${MusicScreen.ALBUM_DETAIL.name}/${album.id}") }
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -210,6 +209,7 @@ private fun AlbumItem(album: Album, navController: NavController) {
             modifier = Modifier
                 .size(120.dp)
                 .clip(RoundedCornerShape(12.dp))
+                .clickable { navController.navigate("${MusicScreen.ALBUM_DETAIL.name}/${album.id}") }
         )
         Text(
             text = album.title,
@@ -228,8 +228,7 @@ private fun AlbumItem(album: Album, navController: NavController) {
 @Composable
 private fun ArtistItem(artist: Artist, navController: NavController) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { navController.navigate("${MusicScreen.ARTIST_DETAIL.name}/${artist.id}") }
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -241,6 +240,7 @@ private fun ArtistItem(artist: Artist, navController: NavController) {
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
+                .clickable { navController.navigate("${MusicScreen.ARTIST_DETAIL.name}/${artist.id}") }
                 .padding(bottom = 8.dp)
         )
         Text(

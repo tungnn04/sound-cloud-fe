@@ -145,7 +145,10 @@ fun AccountScreen(
                         )
                         AppButton(
                             text = "Logout",
-                            onClick = { },
+                            onClick = {
+                                accountViewModel.logout()
+                                navController.navigate(MusicScreen.LOGIN.name)
+                            },
                             style = ButtonStyle.SECONDARY,
                             modifier = Modifier.weight(1f)
                                 .height(40.dp),

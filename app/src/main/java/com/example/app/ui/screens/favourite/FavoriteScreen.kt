@@ -77,125 +77,107 @@ fun FavoriteScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ConfirmationPrompt(
+            showConfirmationPrompt = showDeleteFavorite,
+            title = songClick?.title ?: "",
+            message = "Are you sure remove this song in favorites ?",
+            onCancel = {
+                showDeleteFavorite = false
+                songClick = null
+            },
+            onDelete = {
+                favoriteViewModel.deleteSong(songClick!!.id)
+                showDeleteFavorite = false
+                songClick = null
+            }
+        )
+        SongOptionMenu(
+            song = songClick,
+            onDismissClick = { songClick = null },
+            onPlayNextClick = onPlayNextClick,
+            onFavoriteClick = { _, _ ->
+                showDeleteFavorite = true
+            },
+            onAddToPlaylist = { songId, playlistId ->
+                favoriteViewModel.addSongToPlaylist(songId, playlistId)
+            },
+            onCreatePlaylist = { playlistName ->
+                favoriteViewModel.createPlaylist(playlistName)
+            },
+            playlists = uiState.playlists
+        )
+        Text(
+            text = "Favorites",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(vertical = 16.dp)
+                .fillMaxWidth()
+        )
+        LazyColumn {
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    AppButton(
+                        text = "Shuffle",
+                        onClick = {
+                            onPlayAll(uiState.songs, true)
+                        },
+                        style = ButtonStyle.PRIMARY,
+                        iconResId = R.drawable.ic_shuffle
+                    )
+                    AppButton(
+                        text = "Play",
+                        onClick = {
+                            onPlayAll(uiState.songs, false)
+                        },
+                        style = ButtonStyle.SECONDARY,
+                        iconResId = R.drawable.ic_play_circle
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val numSong = uiState.songs.size
+                    val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
                     Text(
-                        text = "Favorites",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ) },
-//                actions = {
-//                    IconButton(onClick = {  }) {
-//                        Icon(
-//                            painterResource(id = R.drawable.ic_search),
-//                            contentDescription = "Search",
-//                            tint = Color.White
-//                        )
-//                    }
-//                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp)
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            ConfirmationPrompt(
-                showConfirmationPrompt = showDeleteFavorite,
-                title = songClick?.title ?: "",
-                message = "Are you sure remove this song in favorites ?",
-                onCancel = {
-                    showDeleteFavorite = false
-                    songClick = null
-                },
-                onDelete = {
-                    favoriteViewModel.deleteSong(songClick!!.id)
-                    showDeleteFavorite = false
-                    songClick = null
-                }
-            )
-            SongOptionMenu(
-                song = songClick,
-                onDismissClick = { songClick = null },
-                onPlayNextClick = onPlayNextClick,
-                onFavoriteClick = { _, _ ->
-                    showDeleteFavorite = true
-                },
-                onAddToPlaylist = { songId, playlistId ->
-                    favoriteViewModel.addSongToPlaylist(songId, playlistId)
-                },
-                onCreatePlaylist = { playlistName ->
-                    favoriteViewModel.createPlaylist(playlistName)
-                },
-                playlists = uiState.playlists
-            )
-            LazyColumn {
-                item {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        AppButton(
-                            text = "Shuffle",
-                            onClick = {
-                                onPlayAll(uiState.songs, true)
-                            },
-                            style = ButtonStyle.PRIMARY,
-                            iconResId = R.drawable.ic_shuffle
+                        text = numFavoriteText,
+                        style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
+                    )
+                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_swap),
+                            contentDescription = "Sort",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(20.dp)
                         )
-                        AppButton(
-                            text = "Play",
-                            onClick = {
-                                onPlayAll(uiState.songs, false)
-                            },
-                            style = ButtonStyle.SECONDARY,
-                            iconResId = R.drawable.ic_play_circle
-                        )
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val numSong = uiState.songs.size
-                        val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
-                        Text(
-                            text = numFavoriteText,
-                            style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
-                        )
-                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Icon(
-                                painterResource(id = R.drawable.ic_swap),
-                                contentDescription = "Sort",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
                     }
                 }
-                if (uiState.songs.isNotEmpty()){
-                    items(uiState.songs.size) { index ->
-                        SongItem(
-                            song = uiState.songs[index],
-                            onMoreOptionClick = { songClick = it },
-                            onPlayClick = onPlayClick,
-                            currentSong = currentSong,
-                            isPlaying = isPlaying
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+            }
+            if (uiState.songs.isNotEmpty()){
+                items(uiState.songs.size) { index ->
+                    SongItem(
+                        song = uiState.songs[index],
+                        onMoreOptionClick = { songClick = it },
+                        onPlayClick = onPlayClick,
+                        currentSong = currentSong,
+                        isPlaying = isPlaying
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

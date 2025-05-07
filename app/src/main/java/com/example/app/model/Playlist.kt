@@ -12,7 +12,7 @@ data class PlayList(
 )
 
 @Serializable
-data class CreatePlaylist(
+data class PlaylistRequest(
     val name: String
 )
 

@@ -28,7 +28,7 @@ class LoginViewModel(
         _uiState.value = _uiState.value.copy(password = password)
     }
 
-    suspend fun login(): Unit {
+    suspend fun login() {
         if (uiState.value.email.isEmpty() || uiState.value.password.isEmpty()) {
             throw Exception("All fields are required")
         }

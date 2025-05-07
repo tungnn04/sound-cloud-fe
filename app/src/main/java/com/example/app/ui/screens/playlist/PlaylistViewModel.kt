@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PlaylistViewModel(
-    val playlistRepository: PlaylistRepository
+    private val playlistRepository: PlaylistRepository
 ): ViewModel() {
     private val _uiState = MutableStateFlow(PlaylistUiState())
     val uiState = _uiState.asStateFlow()
@@ -38,6 +38,15 @@ class PlaylistViewModel(
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             val response = playlistRepository.createPlaylist(name)
+            if (response.isSuccessful) {
+                fetchData()
+            }
+        }
+    }
+
+    fun updatePlaylist(id: Int, name: String) {
+        viewModelScope.launch {
+            val response = playlistRepository.updatePlaylist(id, name)
             if (response.isSuccessful) {
                 fetchData()
             }

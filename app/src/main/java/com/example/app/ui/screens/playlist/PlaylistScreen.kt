@@ -1,5 +1,6 @@
 package com.example.app.ui.screens.playlist
 
+import android.view.RoundedCorner
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,10 +65,10 @@ import com.example.app.model.PlayList
 import com.example.app.ui.MusicScreen
 import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.CreatePlaylist
+import com.example.app.ui.components.EditPlaylist
 import com.example.app.ui.components.PlaylistOption
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistScreen(
     navController: NavController,
@@ -78,6 +79,7 @@ fun PlaylistScreen(
     val context = LocalContext.current
     var showCreatePlaylist by remember { mutableStateOf(false)}
     var showDeletePlaylist by remember { mutableStateOf(false)}
+    var showEditPlaylist by remember { mutableStateOf(false)}
     var showPlaylistOption by remember { mutableStateOf(false) }
     var playListClick by remember { mutableStateOf<PlayList?>(null) }
 
@@ -109,127 +111,138 @@ fun PlaylistScreen(
         } ?: Toast.makeText(context, "Playlist not selected", Toast.LENGTH_SHORT).show()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Playlists",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ) },
-//                actions = {
-//                    IconButton(onClick = {  }) {
-//                        Icon(
-//                            painterResource(id = R.drawable.ic_search),
-//                            contentDescription = "Search",
-//                            tint = Color.White
-//                        )
-//                    }
-//                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp)
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    val handleEditPlaylist: (String) -> Unit = {
+        playListClick?.let { playlist ->
+            coroutineScope.launch {
+                try {
+                    playlistViewModel.updatePlaylist(playlist.id,it)
+                    Toast.makeText(context, "Update playlist name successfully", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        e.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } ?: Toast.makeText(context, "Playlist not selected", Toast.LENGTH_SHORT).show()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ConfirmationPrompt(
+            showConfirmationPrompt = showDeletePlaylist,
+            title = playListClick?.name ?: "",
+            message = "Are you sure delete this playlist ?",
+            onCancel = { showDeletePlaylist = false },
+            onDelete = {
+                handleDeletePlaylist()
+                showDeletePlaylist = false
+            }
+        )
+        CreatePlaylist(
+            showCreatePlaylist = showCreatePlaylist,
+            onDismissClick = { showCreatePlaylist = false },
+            onCreatePlaylist = {
+                playlistViewModel.createPlaylist(it)
+            },
+            onDone = {
+                showCreatePlaylist = false
+            }
+        )
+        EditPlaylist(
+            showEditPlaylist = showEditPlaylist,
+            name = playListClick?.name ?: "",
+            onDismissClick = { showEditPlaylist = false },
+            onEditPlaylist = handleEditPlaylist,
+            onDone = {
+                showEditPlaylist = false
+            }
+        )
+        PlaylistOption(
+            showPlaylistOption = showPlaylistOption,
+            playlist = playListClick,
+            onDismissClick = {
+                showPlaylistOption = false
+                playListClick = null
+            },
+            onDelete = {
+                showDeletePlaylist = true
+                showPlaylistOption = false
+            },
+            onEdit = {
+                showEditPlaylist = true
+                showPlaylistOption = false
+            }
+        )
+        Text(
+            text = "Playlists",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(top = 16.dp)
+                .fillMaxWidth()
+        )
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            ConfirmationPrompt(
-                showConfirmationPrompt = showDeletePlaylist,
-                title = playListClick?.name ?: "",
-                message = "Are you sure delete this playlist ?",
-                onCancel = { showDeletePlaylist = false },
-                onDelete = {
-                    handleDeletePlaylist()
-                    showDeletePlaylist = false
-                }
+            val numPlaylist = uiState.playlists.size
+            val numPlaylistText = if (numPlaylist > 1) "$numPlaylist playlists" else "$numPlaylist playlist"
+            Text(
+                text = numPlaylistText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            CreatePlaylist(
-                showCreatePlaylist = showCreatePlaylist,
-                onDismissClick = { showCreatePlaylist = false },
-                onCreatePlaylist = {
-                    playlistViewModel.createPlaylist(it)
-                },
-                onDone = {
-                    showCreatePlaylist = false
-                }
-            )
-            PlaylistOption(
-                showPlaylistOption = showPlaylistOption,
-                playlist = playListClick,
-                onDismissClick = {
-                    showPlaylistOption = false
-                    playListClick = null
-                },
-                onDelete = {
-                    showDeletePlaylist = true
-                    showPlaylistOption = false
-                },
-                onEdit = {  }
-            )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val numPlaylist = uiState.playlists.size
-                val numPlaylistText = if (numPlaylist > 1) "$numPlaylist playlists" else "$numPlaylist playlist"
-                Text(
-                    text = numPlaylistText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+            Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                Icon(
+                    painterResource(id = R.drawable.ic_swap),
+                    contentDescription = "Sort",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(20.dp)
                 )
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_swap),
-                        contentDescription = "Sort",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(20.dp)
+            }
+        }
+        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+        LazyColumn {
+            item {
+                Row(
+                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { showCreatePlaylist = true },
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton ( onClick = {}, modifier = Modifier.size(80.dp)) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_add_circle),
+                            contentDescription = "Add playlist",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Add New Playlist",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
-            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-            LazyColumn {
-                item {
-                    Row(
-                        modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton ( onClick = {showCreatePlaylist = true}, modifier = Modifier.size(80.dp)) {
-                            Icon(
-                                painterResource(id = R.drawable.ic_add_circle),
-                                contentDescription = "Add playlist",
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.fillMaxSize()
-                            )
+            if (uiState.playlists.isNotEmpty()){
+                items(uiState.playlists.size) { index ->
+                    PlayListItem(playList = uiState.playlists[index], navController = navController,
+                        onMoreOptionClick = {
+                            showPlaylistOption = true
+                            playListClick = it
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Add New Playlist",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-                if (uiState.playlists.isNotEmpty()){
-                    items(uiState.playlists.size) { index ->
-                        PlayListItem(playList = uiState.playlists[index], navController = navController,
-                            onMoreOptionClick = {
-                                showPlaylistOption = true
-                                playListClick = it
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

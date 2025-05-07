@@ -1,16 +1,13 @@
 package com.example.app.network
 
 import com.example.app.model.ApiResponse
-import com.example.app.model.CreatePlaylist
 import com.example.app.model.PlayList
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import com.example.app.model.PlaylistRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface PlaylistApiService {
@@ -21,13 +18,12 @@ interface PlaylistApiService {
     suspend fun detail(@Path("id") id: Int): Response<ApiResponse<PlayList>>
 
     @POST("playlists/create")
-    suspend fun createPlaylist(@Body playlist: CreatePlaylist): Response<ApiResponse<Unit>>
+    suspend fun createPlaylist(@Body playlist: PlaylistRequest): Response<ApiResponse<Unit>>
 
     @POST("playlists/update/{id}")
     suspend fun updatePlaylist(
         @Path("id") id: Int,
-        @Part("name") name: RequestBody,
-        @Part("coverImage") coverImage: MultipartBody.Part
+        @Body playlist: PlaylistRequest
     ): Response<ApiResponse<Unit>>
 
     @POST("playlists/{playlistId}/addSong/{songId}")

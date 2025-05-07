@@ -130,6 +130,7 @@ fun UploadSongScreen(
                 Text(
                     text = "Tiêu đề bài hát",
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 OutlinedTextField(
                     value = uiState.title,
@@ -143,15 +144,13 @@ fun UploadSongScreen(
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedContainerColor = Color(0xFFF0F0F0),
-                        unfocusedContainerColor = Color(0xFFF0F0F0),
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        focusedPlaceholderColor = Color.Gray,
-                        unfocusedPlaceholderColor = Color.Gray
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                        cursorColor = MaterialTheme.colorScheme.onBackground,
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
                     ),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -216,6 +215,7 @@ fun ArtistDropdown(
     Text(
         text = "Nghệ sĩ",
         style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onBackground
     )
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -240,13 +240,13 @@ fun ArtistDropdown(
                 .menuAnchor(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color(0xFFF0F0F0),
-                unfocusedContainerColor = Color(0xFFF0F0F0),
-                cursorColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
 
@@ -289,6 +289,7 @@ fun AlbumDropdown(
     Text(
         text = "Album",
         style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onBackground
     )
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -313,13 +314,13 @@ fun AlbumDropdown(
                 .menuAnchor(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color(0xFFF0F0F0),
-                unfocusedContainerColor = Color(0xFFF0F0F0),
-                cursorColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
 
@@ -362,6 +363,7 @@ fun CategoryDropdown(
     Text(
         text = "Category",
         style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onBackground
     )
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -386,13 +388,13 @@ fun CategoryDropdown(
                 .menuAnchor(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color(0xFFF0F0F0),
-                unfocusedContainerColor = Color(0xFFF0F0F0),
-                cursorColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
 
@@ -443,7 +445,7 @@ fun AudioFilePicker(
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    color = MaterialTheme.colorScheme.outline,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable(onClick = onPickAudio)
@@ -456,7 +458,8 @@ fun AudioFilePicker(
             ) {
                 Text(
                     text = audioUri?.path?.substringAfterLast("/") ?: "Chọn file âm thanh",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -484,7 +487,7 @@ fun CoverImagePicker(
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f))
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    color = MaterialTheme.colorScheme.outline,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable(onClick = onPickImage),
@@ -508,7 +511,7 @@ fun CoverImagePicker(
                     Text(
                         text = "Nhấn để chọn ảnh bìa",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
