@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app.ui.MusicScreen
+import com.example.app.ui.components.AppButton
+import com.example.app.ui.components.AppTextField
+import com.example.app.ui.components.ButtonStyle
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -66,35 +69,20 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            OutlinedTextField(
+            AppTextField(
+                label = "Email",
                 value = uiState.email,
-                onValueChange = { loginViewModel.setEmail(it) },
-                label = { Text("Email") },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Next) }
-                ),
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { loginViewModel.setEmail(it)},
+                modifier = Modifier
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            AppTextField(
+                label = "Mật khẩu",
                 value = uiState.password,
-                onValueChange = { loginViewModel.setPassword(it) },
-                label = { Text("Mật khẩu") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { handleLogin() }
-                ),
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { loginViewModel.setPassword(it)},
+                modifier = Modifier
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -111,14 +99,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
+            AppButton(
+                text = "Đăng nhập",
                 onClick = handleLogin,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text("Đăng nhập")
-            }
+                style = ButtonStyle.PRIMARY,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

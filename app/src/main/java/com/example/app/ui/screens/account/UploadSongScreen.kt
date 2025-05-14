@@ -53,6 +53,7 @@ import com.example.app.model.Album
 import com.example.app.model.Artist
 import com.example.app.model.Category
 import com.example.app.ui.components.AppButton
+import com.example.app.ui.components.AppTextField
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.TopBar
 
@@ -127,33 +128,11 @@ fun UploadSongScreen(
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Tiêu đề bài hát",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                OutlinedTextField(
+                AppTextField(
+                    label = "Tiêu đề bài hát",
                     value = uiState.title,
                     onValueChange = { uploadSongViewModel.updateTitle(it) },
-                    placeholder = {
-                        Text(
-                            "Tiêu đề bài hát",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.outline,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
-//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
-                        cursorColor = MaterialTheme.colorScheme.onBackground,
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 ArtistDropdown(
