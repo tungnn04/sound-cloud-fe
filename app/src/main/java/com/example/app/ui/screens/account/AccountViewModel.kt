@@ -1,5 +1,6 @@
 package com.example.app.ui.screens.account
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -73,13 +74,6 @@ class AccountViewModel(
     fun addSongToPlaylist(playlistId: Int, songId: Int) {
         viewModelScope.launch {
             playlistRepository.addSong(playlistId, songId)
-        }
-    }
-
-    suspend fun updateProfile(fullName: String, avatarImage: Pair<File, String>?) {
-        val response = userRepository.updateUser(fullName, avatarImage)
-        if (response.isSuccessful) {
-            fetchData()
         }
     }
 

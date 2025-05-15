@@ -15,6 +15,12 @@ class PlaybackService: MediaSessionService() {
     private lateinit var player: ExoPlayer
     private var mediaSession: MediaSession? = null
 
+    companion object {
+        private const val TAG = "PlaybackService"
+        const val ACTION_SHUTDOWN_SERVICE = "com.example.app.SHUTDOWN_SERVICE"
+        const val EXTRA_SHOW_PLAYER = "com.example.app.SHOW_PLAYER"
+    }
+
     override fun onCreate() {
         super.onCreate()
         player = ExoPlayer.Builder(this)
@@ -26,11 +32,19 @@ class PlaybackService: MediaSessionService() {
                  true
             )
             .build()
+        val sessionActivityIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+
+            putExtra(EXTRA_SHOW_PLAYER, true)
+        }
         val sessionActivityPendingIntent =
             PendingIntent.getActivity(
                 this,
                 0,
-                Intent(this, MainActivity::class.java),
+//                Intent(this, MainActivity::class.java),
+                sessionActivityIntent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
@@ -50,10 +64,26 @@ class PlaybackService: MediaSessionService() {
 
     @OptIn(UnstableApi::class)
     override fun onTaskRemoved(rootIntent: Intent?) {
-        if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+//        if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+        stopSelf()
     }
 
     override fun onGetSession(contronlerInfo: MediaSession.ControllerInfo): MediaSession? {
         return mediaSession
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_SHUTDOWN_SERVICE -> {
+                mediaSession?.run {
+                    player.release()
+                    release()
+                    mediaSession = null
+                }
+                stopSelf()
+                return START_NOT_STICKY
+            }
+        }
+        return super.onStartCommand(intent, flags, startId)
     }
 }

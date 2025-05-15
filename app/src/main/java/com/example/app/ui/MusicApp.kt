@@ -1,10 +1,7 @@
 package com.example.app.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -63,8 +59,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
-import com.example.app.service.PlaybackService
 import com.example.app.ui.screens.account.AccountScreen
+import com.example.app.ui.screens.account.ChangePasswordScreen
 import com.example.app.ui.screens.account.EditProfileScreen
 import com.example.app.ui.screens.account.UploadSongScreen
 import com.example.app.ui.screens.auth.ForgotPasswordScreen
@@ -98,6 +94,7 @@ enum class MusicScreen {
     PLAYLIST_DETAIL,
     UPLOAD_SONG,
     EDIT_PROFILE,
+    CHANGE_PASSWORD,
 }
 
 @SuppressLint("ContextCastToActivity")
@@ -120,15 +117,6 @@ fun MusicApp() {
     val imeVisible by remember {
         derivedStateOf {
             imeInsets.getBottom(density) > 0
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        val intent = Intent(context, PlaybackService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, intent)
-        } else {
-            context.startService(intent)
         }
     }
 
@@ -200,7 +188,7 @@ fun MusicApp() {
                 HomeScreen(navController = navController, onPlayClick = handlePlayClick)
             }
             composable(MusicScreen.LOGIN.name) {
-                LoginScreen(navController = navController)
+                LoginScreen(navController = navController, loginViewModel = loginViewModel)
             }
             composable(MusicScreen.SIGN_UP.name) {
                 SignUpScreen(navController = navController)
@@ -211,7 +199,8 @@ fun MusicApp() {
             composable(MusicScreen.ACCOUNT.name) {
                 AccountScreen(navController = navController, onPlayClick = handlePlayClick,
                     onPlayNextClick = handlePlayNextClick,
-                    currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
+                    currentSong = uiState.currentSong, isPlaying = uiState.isPlaying,
+                    stopService = { musicPlayerViewModel.stopService() })
             }
             composable(MusicScreen.PLAYLIST.name) {
                 PlaylistScreen(navController = navController)
@@ -276,6 +265,9 @@ fun MusicApp() {
             }
             composable(MusicScreen.EDIT_PROFILE.name) {
                 EditProfileScreen(navController = navController)
+            }
+            composable(MusicScreen.CHANGE_PASSWORD.name) {
+                ChangePasswordScreen(navController = navController)
             }
         }
         if (isPlayerScreenVisible) {

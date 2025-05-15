@@ -36,9 +36,11 @@ class LoginViewModel(
             email = uiState.value.email,
             password = uiState.value.password
         )
+        _uiState.value = uiState.value.copy(email = "", password = "")
         if (!response.isSuccessful) throw Exception("Login failed")
         val token: String = response.body()?.data?.token ?: throw Exception("Token is missing")
         userPreferencesRepository.saveTokenPreference(token)
+
     }
 
     suspend fun auth() {

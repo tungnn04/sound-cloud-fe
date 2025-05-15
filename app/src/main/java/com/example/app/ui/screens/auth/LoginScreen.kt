@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.factory)
+    loginViewModel: LoginViewModel
 ) {
     val uiState by loginViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()

@@ -5,15 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -24,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app.ui.MusicScreen
+import com.example.app.ui.components.AppButton
+import com.example.app.ui.components.AppTextField
+import com.example.app.ui.components.ButtonStyle
 import kotlinx.coroutines.launch
 
 @Composable
@@ -77,15 +79,19 @@ fun ForgotPasswordScreen(
     ) {
         when (currentStep) {
             1 -> {
-                OutlinedTextField(
+                AppTextField(
+                    label = "Email",
                     value = uiState.email,
                     onValueChange = { forgotPwViewModel.setEmail(it) },
-                    label = { Text("Nhập email") }
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick = { handleForgotPassword() }) {
-                    Text("Tiếp tục")
-                }
+                AppButton(
+                    text = "Tiếp tục",
+                    onClick = { handleForgotPassword() },
+                    style = ButtonStyle.PRIMARY,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(onClick = { navController.popBackStack() }) {
@@ -93,16 +99,19 @@ fun ForgotPasswordScreen(
                 }
             }
             2 -> {
-
-                OutlinedTextField(
+                AppTextField(
+                    label = "Mã OTP",
                     value = uiState.otp,
                     onValueChange = { forgotPwViewModel.setOtp(it) },
-                    label = { Text("Nhập mã OTP") }
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick = { handleVerifyOtp() }) {
-                    Text("Xác nhận OTP")
-                }
+                AppButton(
+                    text = "Xác nhận",
+                    onClick = { handleVerifyOtp() },
+                    style = ButtonStyle.PRIMARY,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(onClick = { currentStep = 1 }) {
@@ -110,21 +119,26 @@ fun ForgotPasswordScreen(
                 }
             }
             3 -> {
-                OutlinedTextField(
+                AppTextField(
+                    label = "Mật khẩu mới",
                     value = uiState.password,
                     onValueChange = { forgotPwViewModel.setPassword(it) },
-                    label = { Text("Mật khẩu mới") }
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
+                AppTextField(
+                    label = "Nhập lại mật khẩu",
                     value = uiState.confirmPassword,
                     onValueChange = { forgotPwViewModel.setConfirmPassword(it) },
-                    label = { Text("Mật khẩu mới") }
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Button(onClick = { handleResetPassword() }) {
-                    Text("Đặt lại mật khẩu")
-                }
+                AppButton(
+                    text = "Xác nhận",
+                    onClick = { handleResetPassword() },
+                    style = ButtonStyle.PRIMARY,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 

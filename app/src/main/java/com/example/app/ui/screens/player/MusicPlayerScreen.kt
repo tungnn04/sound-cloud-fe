@@ -40,7 +40,9 @@ fun MusicPlayerScreen(
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier.padding(top = 16.dp)
+    ) {
         SongOptionMenu(
             song = songClick,
             onDismissClick = { songClick = null },

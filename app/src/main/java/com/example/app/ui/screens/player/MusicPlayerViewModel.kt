@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -95,10 +96,25 @@ class MusicPlayerViewModel(
         }
     }
 
-    private fun initializeMediaController() {
-        val intent = Intent(application, PlaybackService::class.java)
-        application.startService(intent)
+    fun stopService() {
+        if (isServiceStarted) {
+            val shutdownIntent = Intent(application, PlaybackService::class.java).apply {
+                action = PlaybackService.ACTION_SHUTDOWN_SERVICE
+            }
+            application.startService(shutdownIntent)
+            isServiceStarted = false
+        }
+    }
 
+    private fun initializeMediaController() {
+        val intent = Intent(application.applicationContext, PlaybackService::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(application.applicationContext, intent)
+        } else {
+            application.applicationContext.startService(intent)
+        }
+        isServiceStarted = true
         val sessionToken = SessionToken(application, ComponentName(application, PlaybackService::class.java))
 
         controllerFuture = MediaController.Builder(application,sessionToken).buildAsync()

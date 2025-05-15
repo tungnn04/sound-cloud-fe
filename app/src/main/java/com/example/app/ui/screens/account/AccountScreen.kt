@@ -2,6 +2,7 @@ package com.example.app.ui.screens.account
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -45,6 +48,7 @@ import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.SongItem
 import com.example.app.ui.components.SongOptionMenu
+import com.example.app.ui.screens.auth.LoginViewModel
 
 
 @Composable
@@ -54,7 +58,8 @@ fun AccountScreen(
     onPlayClick: (Int) -> Unit,
     onPlayNextClick: (Int) -> Unit,
     currentSong: Song?,
-    isPlaying: Boolean
+    isPlaying: Boolean,
+    stopService: () -> Unit,
 ) {
     val uiState by accountViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -74,109 +79,164 @@ fun AccountScreen(
         }
     }
 
-    Scaffold(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp)
+    ) {
+        SongOptionMenu(
+            song = songClick,
+            onDismissClick = { songClick = null },
+            onPlayNextClick = onPlayNextClick,
+            onFavoriteClick = { songId, isFavorite ->
+                accountViewModel.favoriteChange(songId, isFavorite)
+            },
+            onAddToPlaylist = { songId, playlistId ->
+                accountViewModel.addSongToPlaylist(songId, playlistId)
+            },
+            onCreatePlaylist = { playlistName ->
+                accountViewModel.createPlaylist(playlistName)
+            },
+            playlists = uiState.playlists
+        )
+        Text(
+            text = "Account",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
 
-    ) {paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp)
-                .padding(paddingValues)
-        ) {
-            SongOptionMenu(
-                song = songClick,
-                onDismissClick = { songClick = null },
-                onPlayNextClick = onPlayNextClick,
-                onFavoriteClick = { songId, isFavorite ->
-                    accountViewModel.favoriteChange(songId, isFavorite)
-                },
-                onAddToPlaylist = { songId, playlistId ->
-                    accountViewModel.addSongToPlaylist(songId, playlistId)
-                },
-                onCreatePlaylist = { playlistName ->
-                    accountViewModel.createPlaylist(playlistName)
-                },
-                playlists = uiState.playlists
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(uiState.user?.avatarUrl ?: "https://res.cloudinary.com/dcwopmt83/image/upload/v1747213838/user_default_xt53cn.png")
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(100.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                )
-                Column(
-                    modifier = Modifier.weight(1f).height(100.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = uiState.user?.fullName ?: "",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = uiState.user?.email ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        AppButton(
-                            text = "Edit profile",
-                            onClick = { navController.navigate(MusicScreen.EDIT_PROFILE.name) },
-                            style = ButtonStyle.PRIMARY,
-                            modifier = Modifier.weight(1f)
-                                .height(40.dp)
-                        )
-                        AppButton(
-                            text = "Logout",
-                            onClick = {
-                                accountViewModel.logout()
-                                navController.navigate(MusicScreen.LOGIN.name)
-                            },
-                            style = ButtonStyle.SECONDARY,
-                            modifier = Modifier.weight(1f)
-                                .height(40.dp),
-
-                        )
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(uiState.user?.avatarUrl ?: "https://res.cloudinary.com/dcwopmt83/image/upload/v1747213838/user_default_xt53cn.png")
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(100.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            )
+            Column(
+                modifier = Modifier.weight(1f).height(100.dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = "My upload",
+                    text = uiState.user?.fullName ?: "",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                IconButton(onClick = { navController.navigate(MusicScreen.UPLOAD_SONG.name) }) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_add_circle),
-                        contentDescription = "Add",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-            uiState.songs.forEach { song ->
-                Spacer(modifier = Modifier.height(8.dp))
-                SongItem(song = song, onPlayClick = onPlayClick, onMoreOptionClick = { songClick = it },
-                    currentSong = currentSong, isPlaying = isPlaying)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = uiState.user?.email ?: "",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "My upload",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            IconButton(onClick = { navController.navigate(MusicScreen.UPLOAD_SONG.name) }) {
+                Icon(
+                    painterResource(id = R.drawable.ic_add_circle),
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        uiState.songs.forEach { song ->
+            Spacer(modifier = Modifier.height(8.dp))
+            SongItem(song = song, onPlayClick = onPlayClick, onMoreOptionClick = { songClick = it },
+                currentSong = currentSong, isPlaying = isPlaying)
+        }
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = "Setting",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = {navController.navigate(MusicScreen.EDIT_PROFILE.name) })
+                .padding(horizontal = 8.dp ,vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_edit),
+                contentDescription = "Edit Profile",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Edit Profile",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = {navController.navigate(MusicScreen.CHANGE_PASSWORD.name) })
+                .padding(horizontal = 8.dp ,vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_key),
+                contentDescription = "Change password",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Change password",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = {
+                    accountViewModel.logout()
+                    stopService()
+                    navController.navigate(MusicScreen.LOGIN.name)
+                })
+                .padding(horizontal = 8.dp ,vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_logout),
+                contentDescription = "Logout",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Logout",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Spacer(Modifier.height(16.dp))
     }
 }

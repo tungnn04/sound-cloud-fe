@@ -108,7 +108,7 @@ fun EditProfileScreen(
             } else {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(uiState.avatarUrl)
+                        .data(uiState.avatarUrl ?: "https://res.cloudinary.com/dcwopmt83/image/upload/v1747213838/user_default_xt53cn.png")
                         .crossfade(true)
                         .build(),
                     contentDescription = null,

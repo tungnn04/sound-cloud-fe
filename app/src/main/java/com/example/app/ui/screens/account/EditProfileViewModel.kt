@@ -34,7 +34,7 @@ class EditProfileViewModel(
                     val user = response.body()?.data
                     _uiState.value = uiState.value.copy(
                         fullName = user?.fullName ?: "",
-                        avatarUrl = user?.avatarUrl ?: ""
+                        avatarUrl = user?.avatarUrl
                     )
                 } else {
                     _message.value = response.body()?.message
@@ -108,7 +108,7 @@ class EditProfileViewModel(
 
 data class EditProfileUiState(
     val fullName: String = "",
-    val avatarUrl: String = "",
+    val avatarUrl: String? = null,
     val avatarImage: Pair<File, String>? = null,
     val isLoading: Boolean = false,
 )

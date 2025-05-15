@@ -218,7 +218,7 @@ fun PlaylistScreen(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton ( onClick = {}, modifier = Modifier.size(80.dp)) {
+                    IconButton ( onClick = { showCreatePlaylist = true }, modifier = Modifier.size(80.dp)) {
                         Icon(
                             painterResource(id = R.drawable.ic_add_circle),
                             contentDescription = "Add playlist",
