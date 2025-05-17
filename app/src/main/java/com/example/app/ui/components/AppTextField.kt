@@ -10,12 +10,18 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.app.model.ForgotPassword
 
 @Composable
 fun AppTextField(
     label: String,
     value: String,
+    isPassword: Boolean = false,
     onValueChange: (String) -> Unit,
     modifier: Modifier
 ) {
@@ -25,6 +31,7 @@ fun AppTextField(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.W500,
             color = MaterialTheme.colorScheme.onBackground
         )
         OutlinedTextField(
@@ -38,6 +45,11 @@ fun AppTextField(
                 )
             },
             shape = RoundedCornerShape(12.dp),
+            visualTransformation = if (isPassword) {
+                PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.outline,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,

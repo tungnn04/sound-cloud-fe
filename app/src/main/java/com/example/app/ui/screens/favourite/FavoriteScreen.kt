@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -125,7 +126,7 @@ fun FavoriteScreen(
         LazyColumn {
             item {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -138,6 +139,7 @@ fun FavoriteScreen(
                         style = ButtonStyle.PRIMARY,
                         iconResId = R.drawable.ic_shuffle
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
                     AppButton(
                         text = "Play",
                         onClick = {
@@ -147,6 +149,7 @@ fun FavoriteScreen(
                         iconResId = R.drawable.ic_play_circle
                     )
                 }
+                Spacer(Modifier.height(16.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -156,13 +159,13 @@ fun FavoriteScreen(
                     val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
                     Text(
                         text = numFavoriteText,
-                        style = TextStyle(color = Color.Gray, fontSize = 14.sp, textAlign = TextAlign.Start),
+                        style = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, textAlign = TextAlign.Start),
                     )
-                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
                         Icon(
                             painterResource(id = R.drawable.ic_swap),
                             contentDescription = "Sort",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }

@@ -127,8 +127,8 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
             .fillMaxWidth()
             .padding(start = 16.dp, top = 32.dp, end = 48.dp, bottom = 16.dp)
             .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(24.dp))
-            .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable { onSearchClick() }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically

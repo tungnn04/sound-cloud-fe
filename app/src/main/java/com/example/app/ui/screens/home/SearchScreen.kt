@@ -113,6 +113,7 @@ fun SearchScreen(
     Column(
     ) {
         TopAppBar(
+            modifier = Modifier.padding(top = 0.dp),
             title = {
                 TextField(
                     value = uiState.searchText,
@@ -146,7 +147,7 @@ fun SearchScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     },
                     colors = TextFieldDefaults.colors(
@@ -169,7 +170,7 @@ fun SearchScreen(
                     Icon(
                         painterResource(id = R.drawable.ic_back),
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             },
@@ -211,17 +212,26 @@ fun SearchScreen(
                 CategoryButton(
                     text = "Songs",
                     isSelected = uiState.searchCategory == SearchCategory.SONGS,
-                    onClick = { searchViewModel.setSearchCategory(SearchCategory.SONGS) }
+                    onClick = {
+                        searchViewModel.setSearchCategory(SearchCategory.SONGS)
+                        handleSearch()
+                    }
                 )
                 CategoryButton(
                     text = "Artists",
                     isSelected = uiState.searchCategory == SearchCategory.ARTISTS,
-                    onClick = { searchViewModel.setSearchCategory(SearchCategory.ARTISTS) }
+                    onClick = {
+                        searchViewModel.setSearchCategory(SearchCategory.ARTISTS)
+                        handleSearch()
+                    }
                 )
                 CategoryButton(
                     text = "Albums",
                     isSelected = uiState.searchCategory == SearchCategory.ALBUMS,
-                    onClick = { searchViewModel.setSearchCategory(SearchCategory.ALBUMS) }
+                    onClick = {
+                        searchViewModel.setSearchCategory(SearchCategory.ALBUMS)
+                        handleSearch()
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))

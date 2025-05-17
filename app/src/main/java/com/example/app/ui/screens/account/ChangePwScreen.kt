@@ -24,6 +24,7 @@ import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.AppTextField
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.TopBar
+import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,8 +39,8 @@ fun ChangePasswordScreen(
         coroutineScope.launch {
             try {
                 changePwViewModel.changePassword()
+                FancyToast.makeText(context, "Password changed successfully", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show()
                 navController.navigateUp()
-                Toast.makeText(context, "Password changed successfully", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
@@ -65,6 +66,7 @@ fun ChangePasswordScreen(
                 value = uiState.oldPassword,
                 onValueChange = { changePwViewModel.setOldPassword(it) },
                 label = "Current Password",
+                isPassword = true,
                 modifier = Modifier
             )
 
@@ -72,6 +74,7 @@ fun ChangePasswordScreen(
                 value = uiState.newPassword,
                 onValueChange = { changePwViewModel.setNewPassword(it) },
                 label = "New Password",
+                isPassword = true,
                 modifier = Modifier
             )
 
@@ -79,6 +82,7 @@ fun ChangePasswordScreen(
                 value = uiState.confirmPassword,
                 onValueChange = { changePwViewModel.setConfirmPassword(it) },
                 label = "Confirm Password",
+                isPassword = true,
                 modifier = Modifier
             )
             Spacer(Modifier.height(16.dp))

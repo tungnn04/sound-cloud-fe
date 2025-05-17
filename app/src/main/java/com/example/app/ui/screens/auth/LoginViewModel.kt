@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
 import com.example.app.data.AuthenticationRepository
 import com.example.app.data.UserPreferencesRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -36,10 +37,12 @@ class LoginViewModel(
             email = uiState.value.email,
             password = uiState.value.password
         )
-        _uiState.value = uiState.value.copy(email = "", password = "")
+
         if (!response.isSuccessful) throw Exception("Login failed")
         val token: String = response.body()?.data?.token ?: throw Exception("Token is missing")
         userPreferencesRepository.saveTokenPreference(token)
+        delay(1000)
+        _uiState.value = uiState.value.copy(email = "", password = "")
 
     }
 

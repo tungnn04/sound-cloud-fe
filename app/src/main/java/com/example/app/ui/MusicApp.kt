@@ -2,11 +2,15 @@ package com.example.app.ui
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.platform.LocalContext
@@ -157,6 +162,7 @@ fun MusicApp() {
                             }
                         )
                     }
+                    Spacer(Modifier.height(4.dp))
                     BottomNavigation(navController, selectedItem, onChange = { selectedItem = it})
                 }
             }
@@ -175,6 +181,7 @@ fun MusicApp() {
                         navController.navigate(MusicScreen.HOME.name) {
                             popUpTo(MusicScreen.LOADING.name) { inclusive = true }
                         }
+                        musicPlayerViewModel.initializeMediaController()
                     } catch (e: Exception) {
                         Log.e("Error", e.message.toString())
                         navController.navigate(MusicScreen.LOGIN.name) {
@@ -188,7 +195,8 @@ fun MusicApp() {
                 HomeScreen(navController = navController, onPlayClick = handlePlayClick)
             }
             composable(MusicScreen.LOGIN.name) {
-                LoginScreen(navController = navController, loginViewModel = loginViewModel)
+                LoginScreen(navController = navController, loginViewModel = loginViewModel, startService = { musicPlayerViewModel.initializeMediaController()},
+                    updateSelectedItem = { selectedItem = 0} )
             }
             composable(MusicScreen.SIGN_UP.name) {
                 SignUpScreen(navController = navController)
@@ -300,7 +308,7 @@ fun BottomNavigation(
         R.drawable.ic_account
     )
 
-    NavigationBar(containerColor = MaterialTheme.colorScheme.primaryContainer,
+    NavigationBar(containerColor = MaterialTheme.colorScheme.secondaryContainer,
         modifier = Modifier
             .height(100.dp)
     ) {
@@ -322,8 +330,8 @@ fun BottomNavigation(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     indicatorColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -341,75 +349,78 @@ fun MiniPlayerBar(
 ) {
     val song = uiState.currentSong ?: return
 
-    Column(
+    Surface(
         modifier = modifier
+            .padding(horizontal = 8.dp)
             .fillMaxWidth()
-    ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .clickable { onBarClick() },
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 4.dp,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-               AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(song.coverUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Song cover",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.padding(start = 8.dp)
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-               )
+            .height(64.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onBarClick() },
+        color = Color.Transparent,
+        tonalElevation = 4.dp
+    ){
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(song.coverUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Song cover",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
+            )
+            Column(
+                modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surface),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(Modifier.height(4.dp))
+                Row() {
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = song.title,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = song.artistName ?: "Unknown Artist",
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = song.title,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = song.artistName ?: "Unknown Artist",
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    IconButton(onClick = onPlayPauseClick) {
+                        Icon(
+                            painterResource(id = if (uiState.isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
+                            contentDescription = if (uiState.isPlaying) "Pause" else "Play",
+                            modifier = Modifier.size(36.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    IconButton(onClick = onNextClick) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_skip_next),
+                            contentDescription = "Next",
+                            modifier = Modifier.size(36.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-
-                IconButton(onClick = onPlayPauseClick) {
-                    Icon(
-                        painterResource(id = if (uiState.isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
-                        contentDescription = if (uiState.isPlaying) "Pause" else "Play",
-                        modifier = Modifier.size(36.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                IconButton(onClick = onNextClick) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_skip_next),
-                        contentDescription = "Next",
-                        modifier = Modifier.size(36.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                LinearProgressIndicator(
+                    progress = { uiState.progress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
         }
-
-        LinearProgressIndicator(
-            progress = { uiState.progress },
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.primary,
-        )
     }
 }

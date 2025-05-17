@@ -56,6 +56,7 @@ import com.example.app.ui.components.AppButton
 import com.example.app.ui.components.AppTextField
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.TopBar
+import com.shashank.sony.fancytoastlib.FancyToast
 
 @Composable
 fun UploadSongScreen(
@@ -69,7 +70,7 @@ fun UploadSongScreen(
     val errorMessage by uploadSongViewModel.errorMessage.collectAsState()
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            FancyToast.makeText(context, it , FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show()
             uploadSongViewModel.clearError()
         }
     }
@@ -77,7 +78,7 @@ fun UploadSongScreen(
     val uploadSuccess by uploadSongViewModel.uploadSuccess.collectAsState()
     LaunchedEffect(uploadSuccess) {
         if (uploadSuccess) {
-            Toast.makeText(context, "Tải lên bài hát thành công!", Toast.LENGTH_SHORT).show()
+            FancyToast.makeText(context, "Upload song successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
             uploadSongViewModel.resetUploadSuccess()
         }
     }

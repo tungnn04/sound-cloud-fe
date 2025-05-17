@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.fancytoast)
     implementation(libs.accompanist.systemuicontroller)
 
     implementation(libs.coil.compose)
@@ -49,7 +50,6 @@ dependencies {
     implementation(libs.media3.ui)
     implementation(libs.media3.common)
     implementation(libs.media3.session)
-
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.kotlinx.serialization.converter)

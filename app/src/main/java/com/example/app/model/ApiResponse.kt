@@ -18,3 +18,9 @@ data class ApiResponse<T> (
       val pageOfNumber: Int
   )
 }
+
+@Serializable
+data class ApiError(
+    val code: Int,
+    val message: String,
+)

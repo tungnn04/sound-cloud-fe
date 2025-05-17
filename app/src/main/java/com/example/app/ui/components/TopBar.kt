@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.app.R
 
 @Composable
 fun TopBar (
@@ -37,20 +38,20 @@ fun TopBar (
             Icon(
                 painterResource(id = navigationIcon),
                 contentDescription = "Back",
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (actionIcon != null) {
             IconButton(onClick = onActionClick) {
                 Icon(
                     painterResource(id = actionIcon),
                     contentDescription = "Action",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = if (actionIcon == R.drawable.ic_favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                 )
             }
         }

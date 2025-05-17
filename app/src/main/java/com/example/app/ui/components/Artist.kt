@@ -4,7 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,11 +65,10 @@ fun ArtistItem(
             ) {
                 Text(
                     text = artist.name,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 4.dp)
                 )
-
+                Spacer(Modifier.height(8.dp))
                 val numAlbums = artist.albums?.size ?: 0
                 val numSongs = artist.songs?.size ?: 0
                 val numAlbumsText = if (numAlbums > 1) "$numAlbums albums" else "$numAlbums album"

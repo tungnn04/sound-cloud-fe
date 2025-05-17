@@ -39,8 +39,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.ui.components.AppButton
+import com.example.app.ui.components.AppTextField
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.TopBar
+import com.shashank.sony.fancytoastlib.FancyToast
 
 @Composable
 fun EditProfileScreen(
@@ -52,7 +54,7 @@ fun EditProfileScreen(
     val message by editProfileViewModel.message.collectAsState()
     LaunchedEffect(message) {
         message?.let {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            FancyToast.makeText(context, it, FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show()
         }
     }
 
@@ -127,40 +129,14 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Họ và tên",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
+            AppTextField(
+                label = "Họ và tên",
                 value = uiState.fullName,
                 onValueChange = { editProfileViewModel.setFullName(it) },
-                placeholder = {
-                    Text(
-                        "Họ và tên",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
-                    cursorColor = Color.Black,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             AppButton(
                 text = if (uiState.isLoading) "Cập nhật ..." else "Cập nhật",

@@ -27,11 +27,11 @@ class ChangePwViewModel(
         _uiState.value = _uiState.value.copy(confirmPassword = confirmPassword)
     }
 
-    suspend fun changePassword(): Unit {
+    suspend fun changePassword() {
         if (_uiState.value.newPassword != _uiState.value.confirmPassword) {
             _uiState.value = _uiState.value.copy(errorMessage = "Passwords do not match")
         }
-        val response = authenticationRepository.resetPassword(
+        authenticationRepository.resetPassword(
             newPassword = _uiState.value.newPassword,
             confirmPassword = _uiState.value.confirmPassword,
         )

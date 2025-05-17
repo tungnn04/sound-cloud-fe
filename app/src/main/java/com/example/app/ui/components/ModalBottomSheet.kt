@@ -1,6 +1,5 @@
 package com.example.app.ui.components
 
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
@@ -46,6 +45,7 @@ import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.PlayList
 import com.example.app.model.Song
+import com.shashank.sony.fancytoastlib.FancyToast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +61,8 @@ fun PlaylistOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -91,13 +91,13 @@ fun PlaylistOption(
                         Text(
                             text = playlist?.name ?: "Unknown playlist",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 16.dp)
                         )
                     }
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer , thickness = 1.dp)
                     OptionItem(R.drawable.ic_edit, "Edit playlist", onEdit)
                     OptionItem(R.drawable.ic_delete, "Delete playlist", onDelete)
                 }
@@ -190,8 +190,8 @@ fun SongOption(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -224,7 +224,7 @@ fun SongOption(
                                 Text(
                                     text = song.title,
                                     style = MaterialTheme.typography.headlineSmall,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                                 Text(
@@ -242,12 +242,12 @@ fun SongOption(
                             Icon(
                                 painterResource(id = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline),
                                 contentDescription = "Play song",
-                                tint = MaterialTheme.colorScheme.onSurface,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
                     }
-                    HorizontalDivider(color = Color.Gray , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer , thickness = 1.dp)
                     OptionItem(R.drawable.ic_skip_next, "Play next", onPlayNextClick)
                     OptionItem(R.drawable.ic_add_to_playlist, "Add to playlist", onAddToPlaylistClick)
                 }
@@ -276,12 +276,12 @@ private fun OptionItem(
             painterResource(id = iconResId),
             contentDescription = text,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -306,8 +306,8 @@ fun AddPlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = addPlaylistState,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -319,7 +319,7 @@ fun AddPlaylist(
                     Text(
                         text = "Add to Playlist",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
 
                     HorizontalDivider(color = Color.Gray , thickness = 1.dp)
@@ -333,7 +333,7 @@ fun AddPlaylist(
                             Icon(
                                 painterResource(id = R.drawable.ic_add_circle),
                                 contentDescription = "Add playlist",
-                                tint = MaterialTheme.colorScheme.onSurface,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -341,7 +341,7 @@ fun AddPlaylist(
                         Text(
                             text = "Add New Playlist",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
 
@@ -353,7 +353,7 @@ fun AddPlaylist(
                                     .clickable {
                                         onAddToPlaylist(playlist.id, songId)
                                         onDismissClick()
-                                        Toast.makeText(context, "Added to ${playlist.name}", Toast.LENGTH_SHORT).show()
+                                        FancyToast.makeText(context, "Added to ${playlist.name}", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS,false).show()
                                     },
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
@@ -401,8 +401,8 @@ fun CreatePlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = createState,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -412,33 +412,16 @@ fun CreatePlaylist(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "New Playlist",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = "Create Playlist",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
-                    OutlinedTextField(
+                    AppTextField(
+                        label = "Playlist name",
                         value = playlistName,
                         onValueChange = { playlistName = it },
-                        placeholder = {
-                            Text("My Top 50 Songs",
-                            style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
-//                            focusedContainerColor = Color(0xFFF0F0F0),
-//                            unfocusedContainerColor = Color(0xFFF0F0F0),
-                            cursorColor = MaterialTheme.colorScheme.onSurface,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
-                        ),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.padding()
                     )
-//                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
@@ -482,8 +465,8 @@ fun EditPlaylist(
         ModalBottomSheet(
             onDismissRequest = onDismissClick,
             sheetState = editState,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
             content = {
                 Column(
                     modifier = Modifier
@@ -495,9 +478,9 @@ fun EditPlaylist(
                     Text(
                         text = "Edit Playlist",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface , thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer , thickness = 1.dp)
                     OutlinedTextField(
                         value = playlistName,
                         onValueChange = { playlistName = it },
@@ -506,15 +489,15 @@ fun EditPlaylist(
                                 style = MaterialTheme.typography.bodyMedium ,color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                            focusedBorderColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSecondaryContainer,
 //                            focusedContainerColor = Color(0xFFF0F0F0),
 //                            unfocusedContainerColor = Color(0xFFF0F0F0),
-                            cursorColor = MaterialTheme.colorScheme.onSurface,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface
+                            cursorColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()

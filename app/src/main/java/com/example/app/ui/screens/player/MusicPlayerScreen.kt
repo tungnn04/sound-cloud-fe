@@ -67,7 +67,7 @@ fun MusicPlayerScreen(
             },
             navigationIcon = R.drawable.ic_chevron_down,
             actionIcon = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline,
-            color = MaterialTheme.colorScheme.background,
+            color =  MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp)

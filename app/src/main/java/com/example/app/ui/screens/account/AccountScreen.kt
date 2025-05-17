@@ -105,8 +105,8 @@ fun AccountScreen(
             text = "Account",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
-
             )
+        Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -128,7 +128,7 @@ fun AccountScreen(
                 Text(
                     text = uiState.user?.fullName ?: "",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -154,8 +154,8 @@ fun AccountScreen(
                 Icon(
                     painterResource(id = R.drawable.ic_add_circle),
                     contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(24.dp)
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
                 )
             }
         }

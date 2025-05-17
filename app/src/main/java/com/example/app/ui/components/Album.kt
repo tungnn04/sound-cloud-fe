@@ -48,7 +48,6 @@ fun AlbumItem(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp))
                 .clickable { navController.navigate("${MusicScreen.ALBUM_DETAIL.name}/${album.id}") }
@@ -103,7 +102,8 @@ fun ListAlbum(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(listAlbum.size) { index ->
             AlbumItem(album = listAlbum[index], navController = navController)

@@ -20,6 +20,7 @@ media3-exoplayer = "1.6.0"
 media3-ui = "1.6.0"
 media3-common = "1.6.0"
 media3-session = "1.6.0"
+fancytoast = "2.0.2"
 
 #security-crypto = "1.1.0-alpha06"
 
@@ -50,6 +51,7 @@ media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", versi
 media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3-ui" }
 media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3-common" }
 media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3-session" }
+fancytoast = { group = "io.github.shashank02051997", name = "FancyToast", version.ref = "fancytoast" }
 #androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 
 [plugins]

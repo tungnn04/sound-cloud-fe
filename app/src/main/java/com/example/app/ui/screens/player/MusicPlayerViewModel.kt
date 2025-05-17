@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
 
 data class MusicPlayerUiState(
     val playlist: List<Song> = emptyList(),
@@ -87,7 +88,7 @@ class MusicPlayerViewModel(
     private var isServiceStarted = false
 
     init {
-        initializeMediaController()
+//        initializeMediaController()
         viewModelScope.launch {
             val res = playlistRepository.findAll();
             if (res.isSuccessful) {
@@ -106,7 +107,7 @@ class MusicPlayerViewModel(
         }
     }
 
-    private fun initializeMediaController() {
+    fun initializeMediaController() {
         val intent = Intent(application.applicationContext, PlaybackService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -139,21 +140,21 @@ class MusicPlayerViewModel(
         }, MoreExecutors.directExecutor())
     }
 
-    private fun ensureServiceStarted() {
-        if (!isServiceStarted) {
-            Log.d("MusicPlayerViewModel", "Service not started by this VM instance. Starting now.")
-            val intent = Intent(application.applicationContext, PlaybackService::class.java)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ContextCompat.startForegroundService(application.applicationContext, intent)
-            } else {
-                application.applicationContext.startService(intent)
-            }
-            isServiceStarted = true
-        } else {
-            Log.d("MusicPlayerViewModel", "Service already marked as started by this VM instance.")
-        }
-    }
+//    private fun ensureServiceStarted() {
+//        if (!isServiceStarted) {
+//            Log.d("MusicPlayerViewModel", "Service not started by this VM instance. Starting now.")
+//            val intent = Intent(application.applicationContext, PlaybackService::class.java)
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                ContextCompat.startForegroundService(application.applicationContext, intent)
+//            } else {
+//                application.applicationContext.startService(intent)
+//            }
+//            isServiceStarted = true
+//        } else {
+//            Log.d("MusicPlayerViewModel", "Service already marked as started by this VM instance.")
+//        }
+//    }
 
     private fun setupPlayerListener(player: Player) {
         player.addListener(object : Player.Listener {
@@ -275,7 +276,7 @@ class MusicPlayerViewModel(
     }
 
     fun loadPlaylist(songs: List<Song>, startShuffle: Boolean = false) {
-        ensureServiceStarted()
+//        ensureServiceStarted()
         if (songs.isEmpty()) {
             _uiState.update { it.copy(isLoading = false, error = "Playlist is empty") }
             return
@@ -292,14 +293,14 @@ class MusicPlayerViewModel(
 
     private fun Song.toMediaItem(): MediaItem {
         return MediaItem.Builder()
-            .setUri(Uri.parse(fileUrl))
+            .setUri(fileUrl.toUri())
             .setMediaId(id.toString())
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setTitle(title)
                     .setArtist(artistName)
                     .setAlbumTitle(albumName)
-                    .setArtworkUri(Uri.parse(coverUrl))
+                    .setArtworkUri(coverUrl.toUri())
                     .build()
             )
             .build()
@@ -323,7 +324,7 @@ class MusicPlayerViewModel(
     }
 
     suspend fun playSongImmediately(id: Int) {
-        ensureServiceStarted()
+//        ensureServiceStarted()
         val song = loadSong(id)
         val songMediaId = song?.id.toString()
         var foundIndex = -1
@@ -336,9 +337,8 @@ class MusicPlayerViewModel(
         }
 
         if (foundIndex != -1) {
-
-            if (mediaController?.currentMediaItemIndex == foundIndex && mediaController!!.isPlaying) {
-                Log.d("MusicPlayerVM", "Song is already the current playing item.")
+            if (mediaController?.currentMediaItemIndex == foundIndex) {
+                playPause()
             } else {
                 mediaController?.seekTo(foundIndex, 0)
                 mediaController?.playWhenReady = true
@@ -459,6 +459,7 @@ class MusicPlayerViewModel(
     }
 
     fun playPause() {
+//        ensureServiceStarted()
         if (_uiState.value.currentSong == null && _uiState.value.playlist.isNotEmpty()) {
             mediaController?.seekToDefaultPosition(0)
             mediaController?.play()

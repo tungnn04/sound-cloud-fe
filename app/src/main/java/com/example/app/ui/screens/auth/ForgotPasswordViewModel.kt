@@ -8,8 +8,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
 import com.example.app.data.AuthenticationRepository
 import com.example.app.data.UserPreferencesRepository
+import com.example.app.model.ApiError
+import com.example.app.model.ApiResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.serialization.json.Json
 
 class ForgotPasswordViewModel(
     private val authenticationRepository: AuthenticationRepository,
@@ -35,15 +39,24 @@ class ForgotPasswordViewModel(
         _uiState.value = _uiState.value.copy(confirmPassword = confirmPassword)
     }
 
-    suspend fun forgotPassword(): Unit {
+    suspend fun forgotPassword() {
         if (uiState.value.email.isEmpty()) {
-            throw Exception("All fields are required")
+            throw Exception("Email is required")
         }
+        _uiState.update { it.copy(isLoading = true) }
         val response = authenticationRepository.forgotPassword(email = uiState.value.email)
-        if (!response.isSuccessful) throw Exception("Forgot password failed")
+        if (response.isSuccessful) {
+            _uiState.update { it.copy(isLoading = false) }
+        }
+        else {
+            _uiState.update { it.copy(isLoading = false) }
+            val json = Json { ignoreUnknownKeys = true }
+            val error: ApiError = json.decodeFromString(ApiError.serializer(), response.errorBody()?.string() ?: "")
+            throw Exception(error.message)
+        }
     }
 
-    suspend fun verifyOTP(): Unit {
+    suspend fun verifyOTP() {
         if (uiState.value.otp.isEmpty()) {
             throw Exception("All fields are required")
         }
@@ -53,7 +66,7 @@ class ForgotPasswordViewModel(
         userPreferencesRepository.saveTokenPreference(token)
     }
 
-    suspend fun resetPassword(): Unit {
+    suspend fun resetPassword() {
         if (uiState.value.password.isEmpty() || uiState.value.confirmPassword.isEmpty()) {
             throw Exception("All fields are required")
         }
@@ -86,5 +99,6 @@ data class ForgotPasswordUiState(
     val email: String = "",
     val otp: String = "",
     val password: String = "",
-    val confirmPassword: String = ""
+    val confirmPassword: String = "",
+    val isLoading: Boolean = false,
 )
