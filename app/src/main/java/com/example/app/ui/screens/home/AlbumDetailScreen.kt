@@ -52,8 +52,8 @@ fun AlbumDetailScreen(
     navController: NavController,
     albumDetailViewModel: AlbumDetailViewModel = viewModel(factory = AlbumDetailViewModel.factory),
     albumId: Int,
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean

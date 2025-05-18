@@ -44,8 +44,8 @@ fun AppButton(
             contentColor = MaterialTheme.colorScheme.onPrimary
         }
         ButtonStyle.SECONDARY -> {
-            containerColor = MaterialTheme.colorScheme.secondary
-            contentColor = MaterialTheme.colorScheme.onSecondary
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         }
     }
 

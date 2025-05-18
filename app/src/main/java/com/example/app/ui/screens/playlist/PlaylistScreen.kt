@@ -67,6 +67,7 @@ import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.CreatePlaylist
 import com.example.app.ui.components.EditPlaylist
 import com.example.app.ui.components.PlaylistOption
+import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.launch
 
 @Composable
@@ -100,6 +101,7 @@ fun PlaylistScreen(
             coroutineScope.launch {
                 try {
                     playlistViewModel.deletePlaylist(playlist.id)
+                    FancyToast.makeText(context, "Delete playlist successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
@@ -108,7 +110,7 @@ fun PlaylistScreen(
                     ).show()
                 }
             }
-        } ?: Toast.makeText(context, "Playlist not selected", Toast.LENGTH_SHORT).show()
+        } ?: FancyToast.makeText(context, "Playlist not selected", FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show()
     }
 
     val handleEditPlaylist: (String) -> Unit = {

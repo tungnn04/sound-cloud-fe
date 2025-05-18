@@ -52,7 +52,7 @@ import com.example.app.ui.MusicScreen
 @Composable
 fun HomeScreen(
     navController: NavController,
-    onPlayClick: (Int) -> Unit ,
+    onPlayClick: (Song) -> Unit ,
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.factory),
 ) {
     val scrollState = rememberScrollState()
@@ -126,7 +126,8 @@ fun SearchBar(onSearchClick: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 32.dp, end = 48.dp, bottom = 16.dp)
-            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .clickable { onSearchClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
@@ -169,7 +170,7 @@ fun <T> HorizontalItemList(items: List<T>, itemContent: @Composable (T) -> Unit)
 }
 
 @Composable
-private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
+private fun SongItem(song: Song, onPlayClick: (Song) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -183,7 +184,7 @@ private fun SongItem(song: Song, onPlayClick: (Int) -> Unit) {
             modifier = Modifier
                 .size(120.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { onPlayClick(song.id) }
+                .clickable { onPlayClick(song) }
         )
         Text(
             text = song.title,

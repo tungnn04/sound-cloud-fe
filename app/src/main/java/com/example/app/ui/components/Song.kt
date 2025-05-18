@@ -29,7 +29,7 @@ import com.example.app.model.Song
 fun SongItem(
      song: Song,
      onMoreOptionClick: (Song) -> Unit,
-     onPlayClick: (Int) -> Unit,
+     onPlayClick: (Song) -> Unit,
      currentSong: Song?,
      isPlaying: Boolean
 ) {
@@ -69,7 +69,7 @@ fun SongItem(
           }
 
          Row {
-              IconButton(onClick = {onPlayClick(song.id)}) {
+              IconButton(onClick = {onPlayClick(song)}) {
                    Icon(
                         painterResource(id = if (currentSong?.id == song.id && isPlaying) R.drawable.ic_pause_circle else R.drawable.ic_play_circle),
                         contentDescription = "Play song",
@@ -92,7 +92,7 @@ fun SongItem(
 fun ListSong(
      listSong: List<Song>,
      onMoreOptionClick: (Song) -> Unit,
-     onPlayClick: (Int) -> Unit,
+     onPlayClick: (Song) -> Unit,
      currentSong: Song?,
      isPlaying: Boolean
 ){

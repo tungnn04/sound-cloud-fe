@@ -49,8 +49,8 @@ import com.example.app.ui.components.TopBar
 fun ArtistDetailScreen(
     navController: NavController,
     artistDetailViewModel: ArtistDetailViewModel = viewModel(factory = ArtistDetailViewModel.factory),
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     artistId: Int,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,

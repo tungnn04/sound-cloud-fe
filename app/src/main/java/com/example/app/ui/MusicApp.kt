@@ -109,7 +109,6 @@ fun MusicApp() {
     val musicPlayerViewModel: MusicPlayerViewModel = viewModel(factory = MusicPlayerViewModel.factory)
     val uiState by musicPlayerViewModel.uiState.collectAsState()
     var isPlayerScreenVisible by rememberSaveable { mutableStateOf(false) }
-    val context = LocalContext.current
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -125,15 +124,9 @@ fun MusicApp() {
         }
     }
 
-    val handlePlayClick: (Int) -> Unit = { songId ->
+    val prepareSong: () -> Unit = {
         coroutineScope.launch {
-            musicPlayerViewModel.playSongImmediately(songId)
-        }
-    }
-
-    val handlePlayNextClick: (Int) -> Unit = { songId ->
-        coroutineScope.launch {
-            musicPlayerViewModel.playSongNext(songId)
+            musicPlayerViewModel.getRecentlySong()
         }
     }
 
@@ -153,7 +146,7 @@ fun MusicApp() {
                         MiniPlayerBar(
                             uiState = uiState,
                             onPlayPauseClick = {
-                                musicPlayerViewModel.playPause()
+                                musicPlayerViewModel.playSongImmediately(uiState.currentSong!!)
                                 Log.e("PlayPause", uiState.isPlaying.toString())
                                                },
                             onNextClick = { musicPlayerViewModel.seekToNext() },
@@ -182,6 +175,7 @@ fun MusicApp() {
                             popUpTo(MusicScreen.LOADING.name) { inclusive = true }
                         }
                         musicPlayerViewModel.initializeMediaController()
+                        prepareSong()
                     } catch (e: Exception) {
                         Log.e("Error", e.message.toString())
                         navController.navigate(MusicScreen.LOGIN.name) {
@@ -189,14 +183,13 @@ fun MusicApp() {
                         }
                     }
                 }
-                Text("Loading")
             }
             composable(MusicScreen.HOME.name) {
-                HomeScreen(navController = navController, onPlayClick = handlePlayClick)
+                HomeScreen(navController = navController, onPlayClick = { song -> musicPlayerViewModel.playSongImmediately(song)})
             }
             composable(MusicScreen.LOGIN.name) {
                 LoginScreen(navController = navController, loginViewModel = loginViewModel, startService = { musicPlayerViewModel.initializeMediaController()},
-                    updateSelectedItem = { selectedItem = 0} )
+                    updateSelectedItem = { selectedItem = 0}, loadRecentlySong = { prepareSong()} )
             }
             composable(MusicScreen.SIGN_UP.name) {
                 SignUpScreen(navController = navController)
@@ -205,8 +198,8 @@ fun MusicApp() {
                 ForgotPasswordScreen(navController = navController)
             }
             composable(MusicScreen.ACCOUNT.name) {
-                AccountScreen(navController = navController, onPlayClick = handlePlayClick,
-                    onPlayNextClick = handlePlayNextClick,
+                AccountScreen(navController = navController, onPlayClick = { musicPlayerViewModel.playSongImmediately(it)},
+                    onPlayNextClick = { musicPlayerViewModel.playSongNext(it)},
                     currentSong = uiState.currentSong, isPlaying = uiState.isPlaying,
                     stopService = { musicPlayerViewModel.stopService() })
             }
@@ -214,13 +207,13 @@ fun MusicApp() {
                 PlaylistScreen(navController = navController)
             }
             composable(MusicScreen.FAVORITE.name) {
-                FavoriteScreen(navController = navController, onPlayClick = handlePlayClick,
-                    onPlayNextClick = handlePlayNextClick,
+                FavoriteScreen(navController = navController, onPlayClick = { musicPlayerViewModel.playSongImmediately(it)},
+                    onPlayNextClick = { musicPlayerViewModel.playSongNext(it)},
                     onPlayAll = handlePlayAll, currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(MusicScreen.SEARCH.name) {
-                SearchScreen(navController = navController, onPlayClick = handlePlayClick,
-                    onPlayNextClick = handlePlayNextClick,
+                SearchScreen(navController = navController, onPlayClick = { musicPlayerViewModel.playSongImmediately(it)},
+                    onPlayNextClick = { musicPlayerViewModel.playSongNext(it)},
                     currentSong = uiState.currentSong, isPlaying = uiState.isPlaying)
             }
             composable(
@@ -231,11 +224,11 @@ fun MusicApp() {
                  AlbumDetailScreen(
                      navController = navController,
                      albumId = albumId,
-                     onPlayClick = handlePlayClick,
+                     onPlayClick = { musicPlayerViewModel.playSongImmediately(it) },
                      onPlayAll = handlePlayAll,
                      currentSong = uiState.currentSong,
                      isPlaying = uiState.isPlaying,
-                     onPlayNextClick = handlePlayNextClick,
+                     onPlayNextClick = { musicPlayerViewModel.playSongNext(it) },
                  )
             }
             composable(
@@ -246,8 +239,8 @@ fun MusicApp() {
                 ArtistDetailScreen(
                     navController = navController,
                     artistId = artistId,
-                    onPlayClick = handlePlayClick,
-                    onPlayNextClick = handlePlayNextClick,
+                    onPlayClick = {song -> musicPlayerViewModel.playSongImmediately(song) },
+                    onPlayNextClick = {song -> musicPlayerViewModel.playSongNext(song) },
                     onPlayAll = handlePlayAll,
                     currentSong = uiState.currentSong,
                     isPlaying = uiState.isPlaying
@@ -261,8 +254,8 @@ fun MusicApp() {
                 PlaylistDetailScreen(
                     navController = navController,
                     playlistId = playlistId,
-                    onPlayClick = handlePlayClick,
-                    onPlayNextClick = handlePlayNextClick,
+                    onPlayClick = {song -> musicPlayerViewModel.playSongImmediately(song)},
+                    onPlayNextClick = {song -> musicPlayerViewModel.playSongNext(song)},
                     onPlayAll = handlePlayAll,
                     currentSong = uiState.currentSong,
                     isPlaying = uiState.isPlaying
@@ -282,8 +275,8 @@ fun MusicApp() {
             MusicPlayerScreen(
                 musicPlayerViewModel = musicPlayerViewModel,
                 onMinimize = { isPlayerScreenVisible = false },
-                onPlayClick = handlePlayClick,
-                onPlayNextClick = handlePlayNextClick,
+                onPlayClick = { musicPlayerViewModel.playSongImmediately(it)},
+                onPlayNextClick = { musicPlayerViewModel.playSongNext(it)},
             )
         }
     }

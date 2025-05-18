@@ -33,11 +33,11 @@ fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     startService: () -> Unit,
+    loadRecentlySong: () -> Unit,
     updateSelectedItem: () -> Unit,
 ) {
     val uiState by loginViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     val handleLogin: () -> Unit = {
@@ -47,6 +47,7 @@ fun LoginScreen(
                 navController.navigate(MusicScreen.HOME.name)
                 updateSelectedItem()
                 startService()
+                loadRecentlySong()
             } catch (e: Exception) {
                 delay(300)
                 FancyToast.makeText(context, e.message, FancyToast.LENGTH_LONG, FancyToast.ERROR, false ).show()

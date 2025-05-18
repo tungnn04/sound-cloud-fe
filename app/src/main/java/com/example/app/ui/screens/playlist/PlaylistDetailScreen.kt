@@ -52,8 +52,8 @@ fun PlaylistDetailScreen(
     playlistId: Int,
     navController: NavController,
     playlistDetailViewModel: PlaylistDetailViewModel = viewModel(factory = PlaylistDetailViewModel.factory),
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean

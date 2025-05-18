@@ -54,8 +54,8 @@ import com.example.app.ui.components.SongOptionMenu
 fun FavoriteScreen(
     navController: NavController,
     favoriteViewModel: FavoriteViewModel = viewModel(factory = FavoriteViewModel.factory),
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     onPlayAll: (List<Song>, Boolean) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean

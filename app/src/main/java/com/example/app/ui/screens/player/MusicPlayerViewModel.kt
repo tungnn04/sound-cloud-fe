@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +39,9 @@ import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
+import com.example.app.data.HistoryRepository
+import com.example.app.model.History
+import com.shashank.sony.fancytoastlib.FancyToast
 
 data class MusicPlayerUiState(
     val playlist: List<Song> = emptyList(),
@@ -76,7 +77,8 @@ class MusicPlayerViewModel(
     private val application: Application,
     private val songRepository: SongRepository,
     private val playlistRepository: PlaylistRepository,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MusicPlayerUiState())
@@ -105,6 +107,7 @@ class MusicPlayerViewModel(
             application.startService(shutdownIntent)
             isServiceStarted = false
         }
+        _uiState.update { it.copy(currentSong = null) }
     }
 
     fun initializeMediaController() {
@@ -139,22 +142,6 @@ class MusicPlayerViewModel(
 
         }, MoreExecutors.directExecutor())
     }
-
-//    private fun ensureServiceStarted() {
-//        if (!isServiceStarted) {
-//            Log.d("MusicPlayerViewModel", "Service not started by this VM instance. Starting now.")
-//            val intent = Intent(application.applicationContext, PlaybackService::class.java)
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                ContextCompat.startForegroundService(application.applicationContext, intent)
-//            } else {
-//                application.applicationContext.startService(intent)
-//            }
-//            isServiceStarted = true
-//        } else {
-//            Log.d("MusicPlayerViewModel", "Service already marked as started by this VM instance.")
-//        }
-//    }
 
     private fun setupPlayerListener(player: Player) {
         player.addListener(object : Player.Listener {
@@ -276,7 +263,6 @@ class MusicPlayerViewModel(
     }
 
     fun loadPlaylist(songs: List<Song>, startShuffle: Boolean = false) {
-//        ensureServiceStarted()
         if (songs.isEmpty()) {
             _uiState.update { it.copy(isLoading = false, error = "Playlist is empty") }
             return
@@ -323,10 +309,30 @@ class MusicPlayerViewModel(
         return null;
     }
 
-    suspend fun playSongImmediately(id: Int) {
+    suspend fun getRecentlySong(){
+        val response = historyRepository.getRecentlySong()
+        if (response.isSuccessful) {
+            _uiState.update { it.copy(isLoading = false) }
+            val history = response.body()?.data
+            if (history != null) {
+                val song = songRepository.detail(history.songId)
+
+               if (song.isSuccessful) {
+                   _uiState.update { it.copy(currentSong = song.body()?.data) }
+                } else {
+                    _uiState.update { it.copy(error = "Song not found") }
+                }
+            } else {
+                _uiState.update { it.copy(error = "Song not found") }
+            }
+        } else {
+            _uiState.update { it.copy(error = "Failed to load song") }
+        }
+    }
+
+    fun playSongImmediately(song: Song) {
 //        ensureServiceStarted()
-        val song = loadSong(id)
-        val songMediaId = song?.id.toString()
+        val songMediaId = song.id.toString()
         var foundIndex = -1
 
         for (i in 0 until mediaController!!.mediaItemCount) {
@@ -366,26 +372,18 @@ class MusicPlayerViewModel(
 
     }
 
-    suspend fun playSongNext(id: Int) {
+    fun playSongNext(song: Song) {
         val currentMediaItemIndex = mediaController?.currentMediaItemIndex
         val mediaItemCount = mediaController?.mediaItemCount
-        val songMediaId = id.toString()
+        val songMediaId = song.id.toString()
 
         if (currentMediaItemIndex == -1 || mediaItemCount == 0) {
             Log.d("MusicPlayerVM", "PlayNext: No current item or empty queue, playing immediately instead.")
-            playSongImmediately(id = id)
+            playSongImmediately(song)
             return
         }
 
-        Log.d("MusicPlayerVM", "PlayNext: Processing song ID $id. Current index: $currentMediaItemIndex, Count: $mediaItemCount")
         _uiState.update { it.copy(isLoading = true, error = null) }
-
-        val song = this.loadSong(id = id)
-        if (song == null) {
-            Log.e("MusicPlayerVM", "PlayNext: Failed to load song $id.")
-            _uiState.update { it.copy(isLoading = false) }
-            return
-        }
 
         val insertIndex = currentMediaItemIndex?.plus(1)
 
@@ -399,28 +397,23 @@ class MusicPlayerViewModel(
 
         try {
             if (existingIndex != -1) {
-                Log.d("MusicPlayerVM", "PlayNext: Song $id found at index $existingIndex.")
 
                 when (existingIndex) {
                     insertIndex -> {
-                        Log.d("MusicPlayerVM", "PlayNext: Song $id is already the next item.")
-                        Toast.makeText(application, "${song.title} is already next", Toast.LENGTH_SHORT).show()
+                        FancyToast.makeText(application, "${song.title} is already next", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
                     }
                     currentMediaItemIndex -> {
-                        Log.d("MusicPlayerVM", "PlayNext: Cannot move the currently playing song ($id) to be next of itself.")
-                        Toast.makeText(application, "Cannot play next the current song", Toast.LENGTH_SHORT).show()
                     }
                     else -> {
-                        Log.d("MusicPlayerVM", "PlayNext: Moving song $id from index $existingIndex to $insertIndex.")
                         if (insertIndex != null) {
                             mediaController?.moveMediaItem(existingIndex, insertIndex)
                         }
 
                         _uiState.update { currentState ->
                             val currentPlaylist = currentState.playlist.filterNotNull().toMutableList()
-                            val itemToMove = currentPlaylist.find { it.id == id }
+                            val itemToMove = currentPlaylist.find { it.id == song.id }
                             if (itemToMove != null) {
-                                val actualExistingIndex = currentPlaylist.indexOfFirst{ it.id == id}
+                                val actualExistingIndex = currentPlaylist.indexOfFirst{ it.id == song.id}
                                 if(actualExistingIndex != -1) {
                                     currentPlaylist.removeAt(actualExistingIndex)
                                     val actualInsertIndex = insertIndex?.coerceAtMost(currentPlaylist.size)
@@ -435,7 +428,6 @@ class MusicPlayerViewModel(
                     }
                 }
             } else {
-                Log.d("MusicPlayerVM", "PlayNext: Song $id not found in queue. Adding at index $insertIndex.")
                 val newMediaItem = song.toMediaItem()
 
                 mediaController?.addMediaItem(insertIndex!!, newMediaItem)
@@ -448,10 +440,9 @@ class MusicPlayerViewModel(
                     }
                     currentState.copy(playlist = currentPlaylist)
                 }
-                Toast.makeText(application, "Added ${song.title} to play next", Toast.LENGTH_SHORT).show()
+                FancyToast.makeText(application, "Added ${song.title} to play next", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
             }
         } catch (e: Exception) {
-            Log.e("MusicPlayerVM", "Error during playSongNext execution for $id", e)
             _uiState.update { it.copy(error = "An error occurred while modifying the queue.") }
         } finally {
             _uiState.update { it.copy(isLoading = false) }
@@ -540,7 +531,8 @@ class MusicPlayerViewModel(
                 val songRepository = application.container.songRepository
                 val playlistRepository = application.container.playlistRepository
                 val favoriteRepository = application.container.favoriteRepository
-                MusicPlayerViewModel(application, songRepository, playlistRepository, favoriteRepository)
+                val historyRepository = application.container.historyRepository
+                MusicPlayerViewModel(application, songRepository, playlistRepository, favoriteRepository, historyRepository)
             }
         }
     }

@@ -9,6 +9,7 @@ import com.example.app.network.AuthInterceptor
 import com.example.app.network.AuthenticationApiService
 import com.example.app.network.CategoryApiService
 import com.example.app.network.FavoriteApiService
+import com.example.app.network.HistoryApiService
 import com.example.app.network.PlaylistApiService
 import com.example.app.network.SongApiService
 import com.example.app.network.UserApiService
@@ -28,6 +29,7 @@ interface AppContainer {
     val artistRepository: ArtistRepository
     val categoryRepository: CategoryRepository
     val favoriteRepository: FavoriteRepository
+    val historyRepository: HistoryRepository
 }
 
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
@@ -68,6 +70,10 @@ class DefaultAppContainer(context: Context): AppContainer {
 
     override val favoriteRepository: FavoriteRepository by lazy {
         FavoriteRepositoryImpl(retrofit.create(FavoriteApiService::class.java))
+    }
+
+    override val historyRepository: HistoryRepository by lazy {
+        HistoryRepositoryImpl(retrofit.create(HistoryApiService::class.java))
     }
 }
 

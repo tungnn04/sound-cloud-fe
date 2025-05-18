@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -71,8 +72,8 @@ import kotlinx.coroutines.launch
 fun SearchScreen(
     navController: NavController,
     searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.factory),
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean
 ) {
@@ -112,72 +113,68 @@ fun SearchScreen(
 
     Column(
     ) {
-        TopAppBar(
-            modifier = Modifier.padding(top = 0.dp),
-            title = {
-                TextField(
-                    value = uiState.searchText,
-                    onValueChange = { searchViewModel.setSearchText(it) },
-                    placeholder = {
-                        Text("Search" ,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Search
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            handleSearch()
-                        }
-                    ),
-                    trailingIcon = {
-                        if (uiState.searchText.isNotEmpty()) {
-                            IconButton(onClick = { searchViewModel.clearSearch() }) {
-                                Icon(
-                                    painterResource(id = R.drawable.ic_close),
-                                    contentDescription = "Clear",
-                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
-                            }
-                        }
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                        cursorColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .focusRequester(focusRequester)
-
+        Row(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).padding(top = 16.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(
+                    painterResource(id = R.drawable.ic_back),
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
-            },
-            navigationIcon = {
-                IconButton(onClick = { navController.navigateUp() }) {
+            }
+            Spacer(Modifier.width(16.dp))
+            TextField(
+                value = uiState.searchText,
+                onValueChange = { searchViewModel.setSearchText(it) },
+                placeholder = {
+                    Text("Search" ,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        handleSearch()
+                    }
+                ),
+                trailingIcon = {
+                    if (uiState.searchText.isNotEmpty()) {
+                        IconButton(onClick = { searchViewModel.clearSearch() }) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_close),
+                                contentDescription = "Clear",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                },
+                leadingIcon = {
                     Icon(
-                        painterResource(id = R.drawable.ic_back),
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                     )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                    cursorColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .weight(1f)
+                    .focusRequester(focusRequester)
             )
-        )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -207,7 +204,6 @@ fun SearchScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 CategoryButton(
                     text = "Songs",
@@ -268,8 +264,8 @@ fun CategoryButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
         ),
         modifier = Modifier.padding(end = 8.dp)
     ) {
@@ -307,7 +303,7 @@ fun NotFoundContent() {
 }
 
 @Composable
-fun SearchResultList(uiState: SearchUiState, navController: NavController, onPlayClick: (Int) -> Unit,
+fun SearchResultList(uiState: SearchUiState, navController: NavController, onPlayClick: (Song) -> Unit,
                      onMoreOptionClick: (Song) -> Unit, currentSong: Song?, isPlaying: Boolean) {
     when (uiState.searchCategory) {
         SearchCategory.SONGS -> {

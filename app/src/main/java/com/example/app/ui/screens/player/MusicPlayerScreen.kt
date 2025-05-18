@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -26,8 +25,8 @@ import com.example.app.ui.components.TopBar
 fun MusicPlayerScreen(
     musicPlayerViewModel: MusicPlayerViewModel,
     onMinimize: () -> Unit,
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit
 ) {
     val context = LocalContext.current
     val uiState by musicPlayerViewModel.uiState.collectAsState()

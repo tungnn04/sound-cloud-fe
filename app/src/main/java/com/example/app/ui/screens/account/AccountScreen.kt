@@ -55,8 +55,8 @@ import com.example.app.ui.screens.auth.LoginViewModel
 fun AccountScreen(
     navController: NavController,
     accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.factory),
-    onPlayClick: (Int) -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayClick: (Song) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean,
     stopService: () -> Unit,
@@ -152,9 +152,9 @@ fun AccountScreen(
             )
             IconButton(onClick = { navController.navigate(MusicScreen.UPLOAD_SONG.name) }) {
                 Icon(
-                    painterResource(id = R.drawable.ic_add_circle),
+                    painterResource(id = R.drawable.ic_add_song),
                     contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(32.dp)
                 )
             }

@@ -112,7 +112,7 @@ fun SongOptionMenu(
     onCreatePlaylist: (String) -> Unit,
     onAddToPlaylist: (Int, Int) -> Unit,
     onDismissClick: () -> Unit,
-    onPlayNextClick: (Int) -> Unit,
+    onPlayNextClick: (Song) -> Unit,
     onFavoriteClick: (Int, Boolean) -> Unit,
     playlists: List<PlayList>
 ) {
@@ -142,7 +142,7 @@ fun SongOptionMenu(
                 showSongOption = false
             },
             onPlayNextClick = {
-                onPlayNextClick(song.id)
+                onPlayNextClick(song)
                 showSongOption = false
             },
             onFavoriteClick = onFavoriteClick,
