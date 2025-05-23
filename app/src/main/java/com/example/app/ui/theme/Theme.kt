@@ -8,8 +8,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.app.data.ThemeSetting
+import com.example.app.data.UserPreferencesRepository
+import com.example.app.ui.screens.account.DarkModeViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 private val DarkColorScheme = darkColorScheme(
     primary = darkPrimary,
@@ -69,16 +77,16 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MusicTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    darkModeViewModel: DarkModeViewModel = viewModel(factory = DarkModeViewModel.factory),
+    content: @Composable () -> Unit,
 ) {
+    val currentThemeSetting by darkModeViewModel.currentTheme.collectAsState()
+    val darkTheme = when (currentThemeSetting) {
+        ThemeSetting.LIGHT -> false
+        ThemeSetting.DARK -> true
+        ThemeSetting.SYSTEM -> isSystemInDarkTheme()
+    }
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

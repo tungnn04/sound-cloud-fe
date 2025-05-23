@@ -16,6 +16,7 @@ class UserPreferencesRepository(
 ) {
     private companion object {
         val TOKEN = stringPreferencesKey("token")
+        val THEME_SETTING = stringPreferencesKey("theme_setting")
         const val TAG = "UserPreferencesRepo"
     }
     val token: Flow<String> = dataStore.data
@@ -32,6 +33,19 @@ class UserPreferencesRepository(
         preferences[TOKEN] ?: ""
     }
 
+    val themeSetting: Flow<ThemeSetting> = dataStore.data
+        .map { preferences ->
+            ThemeSetting.valueOf(
+                preferences[THEME_SETTING] ?: ThemeSetting.SYSTEM.name
+            )
+        }
+
+    suspend fun setThemeSetting(themeSetting: ThemeSetting) {
+        dataStore.edit { preferences ->
+            preferences[THEME_SETTING] = themeSetting.name
+        }
+    }
+
     suspend fun saveTokenPreference (token: String) {
         dataStore.edit { preferences ->
             preferences[TOKEN] = token
@@ -43,5 +57,8 @@ class UserPreferencesRepository(
             preferences.remove(TOKEN)
         }
     }
+}
 
+enum class ThemeSetting {
+    LIGHT, DARK, SYSTEM
 }

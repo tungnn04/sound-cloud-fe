@@ -1,6 +1,5 @@
 package com.example.app.ui.screens.account
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -9,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
 import com.example.app.data.FavoriteRepository
 import com.example.app.data.PlaylistRepository
+import com.example.app.data.ThemeSetting
 import com.example.app.data.UserPreferencesRepository
 import com.example.app.data.UserRepository
 import com.example.app.model.PlayList
@@ -16,8 +16,9 @@ import com.example.app.model.Song
 import com.example.app.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.io.File
+import kotlinx.coroutines.runBlocking
 
 class AccountViewModel(
     private val userRepository: UserRepository,
@@ -25,7 +26,8 @@ class AccountViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-    private val _uiState = MutableStateFlow(AccountUiState())
+    private val currentThemeSetting = runBlocking { userPreferencesRepository.themeSetting.first() }
+    private val _uiState = MutableStateFlow(AccountUiState(currentThemeSetting = currentThemeSetting))
     val uiState = _uiState.asStateFlow()
 
     suspend fun fetchData() {
@@ -94,5 +96,6 @@ class AccountViewModel(
 data class AccountUiState(
     val user: User? = null,
     val songs: List<Song> = emptyList(),
-    val playlists: List<PlayList> = emptyList()
+    val playlists: List<PlayList> = emptyList(),
+    val currentThemeSetting: ThemeSetting,
 )

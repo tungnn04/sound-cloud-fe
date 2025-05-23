@@ -26,6 +26,7 @@ interface SongRepository {
         audio: Pair<File, String>,
         coverImage: Pair<File, String>
     ): Response<ApiResponse<Unit>>
+    suspend fun related(id: Int): Response<ApiResponse<List<Song>>>
     suspend fun delete(id: Int): Response<ApiResponse<Unit>>
 }
 
@@ -63,6 +64,8 @@ class SongRepositoryImpl(
                 "coverImage", coverImage.first.name, coverImage.first.asRequestBody(coverImage.second.toMediaType())
             )
         )
+
+    override suspend fun related(id: Int): Response<ApiResponse<List<Song>>> = songApiService.related(id)
 
     override suspend fun delete(id: Int): Response<ApiResponse<Unit>> =
         songApiService.delete(id)

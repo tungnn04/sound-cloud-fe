@@ -37,6 +37,9 @@ interface SongApiService {
         @Part coverImage: MultipartBody.Part
     ): Response<ApiResponse<Unit>>
 
+    @GET("songs/{id}/related")
+    suspend fun related(@Path("id") id: Int): Response<ApiResponse<List<Song>>>
+
     @DELETE("songs/delete/{id}")
     suspend fun delete(@Path("id") id: Int): Response<ApiResponse<Unit>>
 }

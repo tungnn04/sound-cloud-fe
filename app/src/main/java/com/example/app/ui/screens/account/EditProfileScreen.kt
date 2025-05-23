@@ -81,9 +81,8 @@ fun EditProfileScreen(
             }
         }
         Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+
         ) {
             TopBar(
                 title = "Edit profile",
@@ -93,60 +92,67 @@ fun EditProfileScreen(
                 actionIcon = null,
                 color = MaterialTheme.colorScheme.background
             )
-
             Spacer(modifier = Modifier.height(16.dp))
-            if (uiState.avatarImage != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(Uri.fromFile(uiState.avatarImage?.first))
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (uiState.avatarImage != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(Uri.fromFile(uiState.avatarImage?.first))
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                } else {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(uiState.avatarUrl ?: "https://res.cloudinary.com/dcwopmt83/image/upload/v1747213838/user_default_xt53cn.png")
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                AppButton(
+                    text = "Chọn ảnh",
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    style = ButtonStyle.PRIMARY
                 )
-            } else {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(uiState.avatarUrl ?: "https://res.cloudinary.com/dcwopmt83/image/upload/v1747213838/user_default_xt53cn.png")
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AppTextField(
+                    label = "Họ và tên",
+                    value = uiState.fullName,
+                    onValueChange = { editProfileViewModel.setFullName(it) },
                     modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                AppButton(
+                    text = if (uiState.isLoading) "Cập nhật ..." else "Cập nhật",
+                    onClick = {
+                        editProfileViewModel.updateProfile()
+                        navController.navigateUp()
+                    },
+                    style = ButtonStyle.PRIMARY,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            AppButton(
-                text = "Chọn ảnh",
-                onClick = { imagePickerLauncher.launch("image/*") },
-                style = ButtonStyle.PRIMARY
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
-            AppTextField(
-                label = "Họ và tên",
-                value = uiState.fullName,
-                onValueChange = { editProfileViewModel.setFullName(it) },
-                modifier = Modifier
-            )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            AppButton(
-                text = if (uiState.isLoading) "Cập nhật ..." else "Cập nhật",
-                onClick = {
-                    editProfileViewModel.updateProfile()
-                    navController.navigateUp()
-                },
-                style = ButtonStyle.PRIMARY,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }

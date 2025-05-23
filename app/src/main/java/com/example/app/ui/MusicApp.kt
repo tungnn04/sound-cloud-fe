@@ -66,6 +66,7 @@ import com.example.app.R
 import com.example.app.model.Song
 import com.example.app.ui.screens.account.AccountScreen
 import com.example.app.ui.screens.account.ChangePasswordScreen
+import com.example.app.ui.screens.account.DarkModeScreen
 import com.example.app.ui.screens.account.EditProfileScreen
 import com.example.app.ui.screens.account.UploadSongScreen
 import com.example.app.ui.screens.auth.ForgotPasswordScreen
@@ -100,6 +101,7 @@ enum class MusicScreen {
     UPLOAD_SONG,
     EDIT_PROFILE,
     CHANGE_PASSWORD,
+    DARK_MODE
 }
 
 @SuppressLint("ContextCastToActivity")
@@ -148,7 +150,7 @@ fun MusicApp() {
                             onPlayPauseClick = {
                                 musicPlayerViewModel.playSongImmediately(uiState.currentSong!!)
                                 Log.e("PlayPause", uiState.isPlaying.toString())
-                                               },
+                            },
                             onNextClick = { musicPlayerViewModel.seekToNext() },
                             onBarClick = {
                                 isPlayerScreenVisible = true
@@ -201,7 +203,11 @@ fun MusicApp() {
                 AccountScreen(navController = navController, onPlayClick = { musicPlayerViewModel.playSongImmediately(it)},
                     onPlayNextClick = { musicPlayerViewModel.playSongNext(it)},
                     currentSong = uiState.currentSong, isPlaying = uiState.isPlaying,
-                    stopService = { musicPlayerViewModel.stopService() })
+                    stopService = { musicPlayerViewModel.stopService() }
+                )
+            }
+            composable(MusicScreen.DARK_MODE.name) {
+                DarkModeScreen(navController = navController)
             }
             composable(MusicScreen.PLAYLIST.name) {
                 PlaylistScreen(navController = navController)

@@ -40,11 +40,11 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
 import com.example.app.data.HistoryRepository
-import com.example.app.model.History
 import com.shashank.sony.fancytoastlib.FancyToast
 
 data class MusicPlayerUiState(
     val playlist: List<Song> = emptyList(),
+    val recommendSong: List<Song> = emptyList(),
     val currentSong: Song? = null,
     val isPlaying: Boolean = false,
     val currentPositionMs: Long = 0L,
@@ -141,6 +141,16 @@ class MusicPlayerViewModel(
             }
 
         }, MoreExecutors.directExecutor())
+    }
+    private fun getSongRelated(songId: Int) {
+        viewModelScope.launch {
+            val response = songRepository.related(songId)
+            if (response.isSuccessful) {
+                _uiState.update { it.copy(recommendSong = response.body()?.data ?: emptyList()) }
+            } else {
+                _uiState.update { it.copy(error = "Failed to load related songs") }
+            }
+        }
     }
 
     private fun setupPlayerListener(player: Player) {
@@ -263,6 +273,7 @@ class MusicPlayerViewModel(
     }
 
     fun loadPlaylist(songs: List<Song>, startShuffle: Boolean = false) {
+        _uiState.update { it.copy(recommendSong = emptyList()) }
         if (songs.isEmpty()) {
             _uiState.update { it.copy(isLoading = false, error = "Playlist is empty") }
             return
@@ -292,23 +303,6 @@ class MusicPlayerViewModel(
             .build()
     }
 
-    private suspend fun loadSong(id: Int): Song? {
-        val response = songRepository.detail(id)
-
-        if (response.isSuccessful) {
-            _uiState.update { it.copy(isLoading = false) }
-            val song = response.body()?.data
-            if (song != null) {
-                return song
-            } else {
-                _uiState.update { it.copy(error = "Song not found") }
-            }
-        } else {
-            _uiState.update { it.copy(error = "Failed to load song") }
-        }
-        return null;
-    }
-
     suspend fun getRecentlySong(){
         val response = historyRepository.getRecentlySong()
         if (response.isSuccessful) {
@@ -334,6 +328,16 @@ class MusicPlayerViewModel(
 //        ensureServiceStarted()
         val songMediaId = song.id.toString()
         var foundIndex = -1
+        var recommendSongIndex = -1
+
+        if (_uiState.value.recommendSong.isNotEmpty()) {
+            for (i in 0 until _uiState.value.recommendSong.size) {
+                if (_uiState.value.recommendSong[i].id == song.id) {
+                    recommendSongIndex = i
+                    break
+                }
+            }
+        }
 
         for (i in 0 until mediaController!!.mediaItemCount) {
             if (mediaController!!.getMediaItemAt(i).mediaId == songMediaId) {
@@ -351,20 +355,37 @@ class MusicPlayerViewModel(
                 if (mediaController?.playbackState == Player.STATE_IDLE) mediaController?.prepare()
                 mediaController?.play()
             }
+        } else if (recommendSongIndex != -1) {
+            val currentPlaylist = _uiState.value.playlist.toMutableList()
+            val currentRecommendSong = _uiState.value.recommendSong.toMutableList()
+            val newMedia = song.toMediaItem()
+            mediaController?.addMediaItem(newMedia)
+            mediaController?.seekTo(mediaController!!.mediaItemCount - 1, 0)
+            mediaController?.playWhenReady = true
+            mediaController?.play()
+
+            currentPlaylist.add(song)
+            _uiState.update { it.copy(playlist = currentPlaylist) }
+
+            currentRecommendSong.remove(song)
+            _uiState.update { it.copy(recommendSong = currentRecommendSong) }
+
         } else {
             Log.d(
                 "MusicPlayerVM",
                 "Song not found in current queue. Setting as new playlist."
             )
-            val newMediaItem = song?.toMediaItem()
-            _uiState.update { it.copy(playlist = listOf(song!!)) }
-            newMediaItem?.let { mediaController?.setMediaItem(it) }
+            getSongRelated(song.id)
+            val newMediaItem = song.toMediaItem()
+            _uiState.update { it.copy(playlist = listOf(song)) }
+            newMediaItem.let { mediaController?.setMediaItem(it) }
             mediaController?.playWhenReady = true
             Log.d("MusicPlayerVM", "Calling prepare() for new playlist.")
             mediaController?.prepare()
             Log.d("MusicPlayerVM", "Called prepare() for new playlist.")
             mediaController?.play()
         }
+
 
         _uiState.update { it.copy(currentSong = song) }
         // Xóa lỗi nếu có
@@ -410,7 +431,7 @@ class MusicPlayerViewModel(
                         }
 
                         _uiState.update { currentState ->
-                            val currentPlaylist = currentState.playlist.filterNotNull().toMutableList()
+                            val currentPlaylist = currentState.playlist.toMutableList()
                             val itemToMove = currentPlaylist.find { it.id == song.id }
                             if (itemToMove != null) {
                                 val actualExistingIndex = currentPlaylist.indexOfFirst{ it.id == song.id}

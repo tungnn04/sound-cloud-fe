@@ -3,6 +3,8 @@ package com.example.app.ui.screens.player
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +19,7 @@ import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
 import com.example.app.ui.components.ListSong
+import com.example.app.ui.components.SongItem
 import com.example.app.ui.components.SongOptionMenu
 import com.example.app.ui.components.TopBar
 
@@ -32,7 +35,7 @@ fun MusicPlayerScreen(
     val uiState by musicPlayerViewModel.uiState.collectAsState()
     var songClick by remember { mutableStateOf<Song?>(null) }
     var isFavorite by remember { mutableStateOf(uiState.currentSong!!.isFavorite) }
-
+    val scrollState = rememberScrollState()
     LaunchedEffect(uiState.error) {
         uiState.error?.let { errorMsg ->
             Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
@@ -41,6 +44,7 @@ fun MusicPlayerScreen(
 
     Column(
         modifier = Modifier.padding(top = 16.dp)
+
     ) {
         SongOptionMenu(
             song = songClick,
@@ -75,7 +79,8 @@ fun MusicPlayerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -160,15 +165,39 @@ fun MusicPlayerScreen(
             )
 
             if (uiState.playlist.isNotEmpty()){
-                ListSong(
-                    listSong = uiState.playlist,
-                    onMoreOptionClick = {
-                        songClick = it
-                    },
-                    onPlayClick = onPlayClick,
-                    currentSong = uiState.currentSong,
-                    isPlaying = uiState.isPlaying
+                uiState.playlist.forEach{song ->
+                    SongItem(
+                        song = song,
+                        onPlayClick = onPlayClick,
+                        onMoreOptionClick = {
+                            songClick = it
+                        },
+                        currentSong = uiState.currentSong,
+                        isPlaying = uiState.isPlaying
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+            if (uiState.recommendSong.isNotEmpty()) {
+                Text(
+                    text = "Recommended",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
                 )
+                uiState.recommendSong.forEach{song ->
+                    SongItem(
+                        song = song,
+                        onPlayClick = onPlayClick,
+                        onMoreOptionClick = {
+                            songClick = it
+                        },
+                        currentSong = uiState.currentSong,
+                        isPlaying = uiState.isPlaying
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+
             }
         }
     }

@@ -19,6 +19,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +62,7 @@ fun AccountScreen(
     onPlayNextClick: (Song) -> Unit,
     currentSong: Song?,
     isPlaying: Boolean,
-    stopService: () -> Unit,
+    stopService: () -> Unit
 ) {
     val uiState by accountViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -181,7 +184,7 @@ fun AccountScreen(
         ) {
             Icon(
                 painterResource(id = R.drawable.ic_edit),
-                contentDescription = "Edit Profile",
+                contentDescription = "Edit profile",
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -210,6 +213,34 @@ fun AccountScreen(
                 text = "Change password",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = {navController.navigate(MusicScreen.DARK_MODE.name) })
+                .padding(horizontal = 8.dp ,vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                painterResource(id = R.drawable.ic_dark_mode),
+                contentDescription = "Change dark theme",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Dark theme",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = uiState.currentThemeSetting.name,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(end = 16.dp)
             )
         }
 
