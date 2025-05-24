@@ -77,6 +77,7 @@ import com.example.app.ui.screens.auth.SignUpScreen
 import com.example.app.ui.screens.favourite.FavoriteScreen
 import com.example.app.ui.screens.home.AlbumDetailScreen
 import com.example.app.ui.screens.home.ArtistDetailScreen
+import com.example.app.ui.screens.home.CategoryScreen
 import com.example.app.ui.screens.home.SearchScreen
 import com.example.app.ui.screens.player.MusicPlayerScreen
 import com.example.app.ui.screens.player.MusicPlayerUiState
@@ -101,7 +102,8 @@ enum class MusicScreen {
     UPLOAD_SONG,
     EDIT_PROFILE,
     CHANGE_PASSWORD,
-    DARK_MODE
+    DARK_MODE,
+    CATEGORY_DETAIL;
 }
 
 @SuppressLint("ContextCastToActivity")
@@ -238,6 +240,20 @@ fun MusicApp() {
                  )
             }
             composable(
+                "${MusicScreen.CATEGORY_DETAIL.name}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) {
+                val categoryId = it.arguments?.getInt("id") ?: -1
+                CategoryScreen(
+                    navController = navController,
+                    categoryId = categoryId,
+                    onPlayClick = { song -> musicPlayerViewModel.playSongImmediately(song) },
+                    onPlayNextClick = { song -> musicPlayerViewModel.playSongNext(song) },
+                    currentSong = uiState.currentSong,
+                    isPlaying = uiState.isPlaying
+                )
+            }
+            composable(
                 "${MusicScreen.ARTIST_DETAIL.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.IntType })
             ) {
@@ -313,7 +329,7 @@ fun BottomNavigation(
     ) {
         items.forEachIndexed { index, screen ->
             NavigationBarItem(
-                icon = { Icon(painterResource(id = icons[index]), contentDescription = null) },
+                icon = { Icon(painterResource(id = icons[index]), contentDescription = null, modifier = Modifier.size(24.dp))  },
                 label = { Text(screen.name) },
                 selected = selectedItem == index,
                 onClick = {

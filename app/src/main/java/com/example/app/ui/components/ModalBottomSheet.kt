@@ -1,6 +1,5 @@
 package com.example.app.ui.components
 
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -251,6 +250,160 @@ fun SongOption(
                     OptionItem(R.drawable.ic_skip_next, "Play next", onPlayNextClick)
                     OptionItem(R.drawable.ic_add_to_playlist, "Add to playlist", onAddToPlaylistClick)
                 }
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SongUploadOption(
+    showSongOption: Boolean,
+    song: Song?,
+    onDismissClick: () -> Unit,
+    onPlayNextClick: () -> Unit,
+    onDelete: () -> Unit,
+    onAddToPlaylistClick: () -> Unit,
+    onFavoriteClick: (Int, Boolean) -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    var isFavorite by remember { mutableStateOf(song!!.isFavorite) }
+    if (showSongOption && song != null) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissClick,
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Row {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(song.coverUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Song cover",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(80.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                            )
+                            Column(
+                                modifier = Modifier.padding(start = 16.dp),
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = song.title,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                                Text(
+                                    text = song.artistName ?: "Unknown artist",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+
+                        IconButton(onClick = {
+                            onFavoriteClick(song.id, isFavorite)
+                            isFavorite = !isFavorite
+                        }) {
+                            Icon(
+                                painterResource(id = if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_outline),
+                                contentDescription = "Play song",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSecondaryContainer , thickness = 1.dp)
+                    OptionItem(R.drawable.ic_skip_next, "Play next", onPlayNextClick)
+                    OptionItem(R.drawable.ic_add_to_playlist, "Add to playlist", onAddToPlaylistClick)
+                    OptionItem(R.drawable.ic_delete, "Delete song", onDelete)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun SongOptionUploadMenu(
+    song: Song?,
+    onCreatePlaylist: (String) -> Unit,
+    onAddToPlaylist: (Int, Int) -> Unit,
+    onDismissClick: () -> Unit,
+    onDelete: () -> Unit,
+    onPlayNextClick: (Song) -> Unit,
+    onFavoriteClick: (Int, Boolean) -> Unit,
+    playlists: List<PlayList>
+) {
+    var showSongOption by remember { mutableStateOf(false) }
+    var showAddPlaylist by remember { mutableStateOf(false) }
+    var showCreatePlaylist by remember { mutableStateOf(false) }
+
+    LaunchedEffect(song) {
+        if (song != null) {
+            showSongOption = true
+            showAddPlaylist = false
+            showCreatePlaylist = false
+        } else {
+            showSongOption = false
+            showAddPlaylist = false
+            showCreatePlaylist = false
+        }
+    }
+
+    if (showSongOption && song != null) {
+        SongUploadOption(
+            showSongOption = true,
+            song = song,
+            onDismissClick = onDismissClick,
+            onAddToPlaylistClick = {
+                showAddPlaylist = true
+                showSongOption = false
+            },
+            onPlayNextClick = {
+                onPlayNextClick(song)
+                showSongOption = false
+            },
+            onFavoriteClick = onFavoriteClick,
+            onDelete = onDelete
+        )
+    }
+    if (showAddPlaylist && song != null) {
+        AddPlaylist(
+            showAddPlaylist = true,
+            onDismissClick = { showAddPlaylist = false },
+            onCreatePlaylist = {
+                showAddPlaylist = false
+                showCreatePlaylist = true
+            },
+            onAddToPlaylist = onAddToPlaylist,
+            songId = song.id,
+            playlists = playlists
+        )
+    }
+    if (showCreatePlaylist) {
+        CreatePlaylist(
+            showCreatePlaylist = true,
+            onDismissClick = { showCreatePlaylist = false },
+            onCreatePlaylist = onCreatePlaylist,
+            onDone = {
+                showCreatePlaylist = false
+                showAddPlaylist = true
             }
         )
     }

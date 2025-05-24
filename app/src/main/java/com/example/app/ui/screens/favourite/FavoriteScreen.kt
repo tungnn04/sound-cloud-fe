@@ -2,6 +2,7 @@ package com.example.app.ui.screens.favourite
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -65,10 +68,11 @@ fun FavoriteScreen(
     val context = LocalContext.current
     var showDeleteFavorite by remember { mutableStateOf(false) }
     var songClick by remember { mutableStateOf<Song?>(null) }
+    var isDesc by remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
         try {
-            favoriteViewModel.fetchData()
+            favoriteViewModel.fetchData(isDesc)
         } catch (e: Exception) {
             Toast.makeText(
                 context,
@@ -95,7 +99,7 @@ fun FavoriteScreen(
                 songClick = null
             },
             onDelete = {
-                favoriteViewModel.deleteSong(songClick!!.id)
+                favoriteViewModel.deleteSong(songClick!!.id, isDesc)
                 showDeleteFavorite = false
                 songClick = null
             }
@@ -161,15 +165,24 @@ fun FavoriteScreen(
                         text = numFavoriteText,
                         style = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, textAlign = TextAlign.Start),
                     )
-                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
+                    Row(modifier = Modifier.clickable { isDesc = !isDesc }, verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Recently Added",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Icon(
-                            painterResource(id = R.drawable.ic_swap),
+                            painterResource(id = if (isDesc) R.drawable.ic_desc else R.drawable.ic_asc),
                             contentDescription = "Sort",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(20.dp)
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(30.dp).padding(start = 8.dp)
                         )
                     }
                 }
+            }
+            item {
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(8.dp))
             }
             if (uiState.songs.isNotEmpty()){
                 items(uiState.songs.size) { index ->

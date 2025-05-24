@@ -6,7 +6,7 @@ import com.example.app.network.FavoriteApiService
 import retrofit2.Response
 
 interface FavoriteRepository {
-    suspend fun fillAll(): Response<ApiResponse<List<Song>>>
+    suspend fun fillAll(sortDesc: Boolean): Response<ApiResponse<List<Song>>>
     suspend fun addSong(id: Int): Response<ApiResponse<Unit>>
     suspend fun deleteSong(id: Int): Response<ApiResponse<Unit>>
 }
@@ -14,8 +14,8 @@ interface FavoriteRepository {
 class FavoriteRepositoryImpl(
     private val favoriteApiService: FavoriteApiService
 ): FavoriteRepository{
-    override suspend fun fillAll(): Response<ApiResponse<List<Song>>> =
-        favoriteApiService.findAll()
+    override suspend fun fillAll(sortDesc: Boolean): Response<ApiResponse<List<Song>>> =
+        favoriteApiService.findAll(sortDesc)
 
     override suspend fun addSong(id: Int): Response<ApiResponse<Unit>> =
         favoriteApiService.addSong(id)

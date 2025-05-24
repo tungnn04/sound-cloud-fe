@@ -28,7 +28,7 @@ class PlaylistDetailViewModel(
             _uiState.value = _uiState.value.copy(isLoading = false)
             _uiState.value = _uiState.value.copy(playlist = response.body()?.data)
         }
-        val res = playlistRepository.findAll();
+        val res = playlistRepository.findAll(true);
         if (res.isSuccessful) {
             _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
@@ -54,7 +54,7 @@ class PlaylistDetailViewModel(
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             playlistRepository.createPlaylist(name)
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }

@@ -1,11 +1,9 @@
 package com.example.app.ui.screens.account
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,9 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -124,7 +118,7 @@ fun EditProfileScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 AppButton(
-                    text = "Chọn ảnh",
+                    text = "Choose avatar",
                     onClick = { imagePickerLauncher.launch("image/*") },
                     style = ButtonStyle.PRIMARY
                 )
@@ -132,7 +126,7 @@ fun EditProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AppTextField(
-                    label = "Họ và tên",
+                    label = "Full name",
                     value = uiState.fullName,
                     onValueChange = { editProfileViewModel.setFullName(it) },
                     modifier = Modifier
@@ -141,7 +135,7 @@ fun EditProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 AppButton(
-                    text = if (uiState.isLoading) "Cập nhật ..." else "Cập nhật",
+                    text = if (uiState.isLoading) "Updating ..." else "Update",
                     onClick = {
                         editProfileViewModel.updateProfile()
                         navController.navigateUp()

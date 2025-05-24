@@ -22,14 +22,14 @@ class FavoriteViewModel(
     private val _uiState = MutableStateFlow(FavoriteUiState())
     val uiState = _uiState.asStateFlow()
 
-    suspend fun fetchData() {
+    suspend fun fetchData(boolean: Boolean) {
         _uiState.value = _uiState.value.copy(isLoading = true)
-        val response = favoriteRepository.fillAll()
+        val response = favoriteRepository.fillAll(boolean)
         if (response.isSuccessful) {
             _uiState.value = _uiState.value.copy(isLoading = false)
             _uiState.value = _uiState.value.copy(songs = response.body()?.data ?: emptyList())
         }
-        val res = playlistRepository.findAll();
+        val res = playlistRepository.findAll(true);
         if (res.isSuccessful) {
             _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
@@ -39,7 +39,7 @@ class FavoriteViewModel(
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             playlistRepository.createPlaylist(name)
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }
@@ -52,11 +52,11 @@ class FavoriteViewModel(
         }
     }
 
-    fun deleteSong(id: Int) {
+    fun deleteSong(id: Int, boolean: Boolean) {
         viewModelScope.launch {
             val response = favoriteRepository.deleteSong(id)
             if (response.isSuccessful) {
-                fetchData()
+                fetchData(boolean)
             }
         }
     }

@@ -19,36 +19,36 @@ class PlaylistViewModel(
     private val _uiState = MutableStateFlow(PlaylistUiState())
     val uiState = _uiState.asStateFlow()
 
-    suspend fun fetchData() {
+    suspend fun fetchData(boolean: Boolean) {
         _uiState.value = _uiState.value.copy(isLoading = true)
-        val response = playlistRepository.findAll()
+        val response = playlistRepository.findAll(boolean)
         if (response.isSuccessful) {
             _uiState.value = _uiState.value.copy(playlists = response.body()?.data ?: emptyList())
         }
         _uiState.value = _uiState.value.copy(isLoading = false)
     }
 
-    suspend fun deletePlaylist(id: Int) {
+    suspend fun deletePlaylist(id: Int, boolean: Boolean) {
         val response = playlistRepository.deletePlaylist(id)
         if (response.isSuccessful) {
-            fetchData()
+            fetchData(boolean)
         }
     }
 
-    fun createPlaylist(name: String) {
+    fun createPlaylist(name: String, boolean: Boolean) {
         viewModelScope.launch {
             val response = playlistRepository.createPlaylist(name)
             if (response.isSuccessful) {
-                fetchData()
+                fetchData(boolean)
             }
         }
     }
 
-    fun updatePlaylist(id: Int, name: String) {
+    fun updatePlaylist(id: Int, name: String, boolean: Boolean) {
         viewModelScope.launch {
             val response = playlistRepository.updatePlaylist(id, name)
             if (response.isSuccessful) {
-                fetchData()
+                fetchData(boolean)
             }
         }
     }

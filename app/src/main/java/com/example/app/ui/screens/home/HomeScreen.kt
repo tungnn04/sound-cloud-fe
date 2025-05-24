@@ -81,7 +81,7 @@ fun HomeScreen(
     ) {
         Header(uiSate.user?.fullName ?: "")
         SearchBar { navController.navigate(MusicScreen.SEARCH.name) }
-        SectionTitle("Popular Songs")
+        SectionTitle("New Songs")
         HorizontalItemList(uiSate.listSong) { song ->
             SongItem(song, onPlayClick)
         }
@@ -95,7 +95,7 @@ fun HomeScreen(
         }
         SectionTitle("Categories")
         HorizontalItemList(uiSate.listCategory) { category ->
-            CategoryItem(category)
+            CategoryItem(category, navController)
         }
     }
 
@@ -255,7 +255,7 @@ private fun ArtistItem(artist: Artist, navController: NavController) {
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, navController: NavController) {
     Column(horizontalAlignment = Alignment.Start) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -267,6 +267,7 @@ fun CategoryItem(category: Category) {
             modifier = Modifier
                 .size(220.dp, 120.dp)
                 .clip(RoundedCornerShape(12.dp))
+                .clickable { navController.navigate("${MusicScreen.CATEGORY_DETAIL.name}/${category.id}") }
         )
         Text(
             text = category.name,

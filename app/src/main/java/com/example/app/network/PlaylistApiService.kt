@@ -9,10 +9,11 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PlaylistApiService {
     @GET("playlists/findAll")
-    suspend fun findAll(): Response<ApiResponse<List<PlayList>>>
+    suspend fun findAll(@Query("sortDesc") sortDesc: Boolean): Response<ApiResponse<List<PlayList>>>
 
     @GET("playlists/{id}")
     suspend fun detail(@Path("id") id: Int): Response<ApiResponse<PlayList>>

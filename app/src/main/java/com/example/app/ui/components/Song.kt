@@ -31,12 +31,13 @@ fun SongItem(
      onMoreOptionClick: (Song) -> Unit,
      onPlayClick: (Song) -> Unit,
      currentSong: Song?,
-     isPlaying: Boolean
+     isPlaying: Boolean,
+     modifier: Modifier = Modifier
 ) {
     Row(
          verticalAlignment = Alignment.CenterVertically,
          horizontalArrangement = Arrangement.SpaceBetween,
-         modifier = Modifier.fillMaxWidth()
+         modifier = modifier.fillMaxWidth()
     ) {
           Row {
                AsyncImage(
@@ -63,7 +64,8 @@ fun SongItem(
                     Text(
                          text = song.artistName ?: "Unknown artist",
                          style = MaterialTheme.typography.bodyMedium,
-                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                         modifier = Modifier.padding(top = 4.dp)
                     )
                }
           }

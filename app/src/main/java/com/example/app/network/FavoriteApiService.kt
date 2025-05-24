@@ -7,10 +7,11 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface FavoriteApiService {
     @GET("favorites/findAll")
-    suspend fun findAll(): Response<ApiResponse<List<Song>>>
+    suspend fun findAll(@Query("sortDesc") sortDesc: Boolean): Response<ApiResponse<List<Song>>>
 
     @POST("favorites/addSong/{songId}")
     suspend fun addSong(@Path("songId") songId: Int): Response<ApiResponse<Unit>>

@@ -92,7 +92,7 @@ class MusicPlayerViewModel(
     init {
 //        initializeMediaController()
         viewModelScope.launch {
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }
@@ -253,7 +253,7 @@ class MusicPlayerViewModel(
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             playlistRepository.createPlaylist(name)
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }
@@ -416,6 +416,17 @@ class MusicPlayerViewModel(
             }
         }
 
+        var recommendSongIndex = -1
+
+        if (_uiState.value.recommendSong.isNotEmpty()) {
+            for (i in 0 until _uiState.value.recommendSong.size) {
+                if (_uiState.value.recommendSong[i].id == song.id) {
+                    recommendSongIndex = i
+                    break
+                }
+            }
+        }
+
         try {
             if (existingIndex != -1) {
 
@@ -462,6 +473,11 @@ class MusicPlayerViewModel(
                     currentState.copy(playlist = currentPlaylist)
                 }
                 FancyToast.makeText(application, "Added ${song.title} to play next", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
+            }
+            if (recommendSongIndex != -1) {
+                val currentRecommendSong = _uiState.value.recommendSong.toMutableList()
+                currentRecommendSong.remove(song)
+                _uiState.update { it.copy(recommendSong = currentRecommendSong) }
             }
         } catch (e: Exception) {
             _uiState.update { it.copy(error = "An error occurred while modifying the queue.") }

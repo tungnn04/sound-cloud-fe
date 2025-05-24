@@ -15,14 +15,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,8 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -47,11 +49,11 @@ import coil.request.ImageRequest
 import com.example.app.R
 import com.example.app.model.Song
 import com.example.app.ui.MusicScreen
-import com.example.app.ui.components.AppButton
-import com.example.app.ui.components.ButtonStyle
+import com.example.app.ui.components.ConfirmationPrompt
 import com.example.app.ui.components.SongItem
-import com.example.app.ui.components.SongOptionMenu
-import com.example.app.ui.screens.auth.LoginViewModel
+import com.example.app.ui.components.SongOptionUploadMenu
+import com.shashank.sony.fancytoastlib.FancyToast
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -69,6 +71,21 @@ fun AccountScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var songClick by remember { mutableStateOf<Song?>(null) }
+    var showDeleteSong by remember { mutableStateOf(false)}
+
+    val handleDeleteSong = {
+        songClick?.let { song ->
+            coroutineScope.launch {
+                try {
+                    accountViewModel.deleteSong(song.id)
+                    songClick = null
+                    FancyToast.makeText(context, "Song deleted successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
+                } catch (e: Exception) {
+                    FancyToast.makeText(context, e.message, FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show()
+                }
+            }
+        }
+    }
 
     LaunchedEffect(true) {
         try {
@@ -89,7 +106,17 @@ fun AccountScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
-        SongOptionMenu(
+        ConfirmationPrompt(
+            showConfirmationPrompt = showDeleteSong,
+            title = songClick?.title ?: "",
+            message = "Are you sure delete this song ?",
+            onCancel = { showDeleteSong = false },
+            onDelete = {
+                handleDeleteSong()
+                showDeleteSong = false
+            }
+        )
+        SongOptionUploadMenu(
             song = songClick,
             onDismissClick = { songClick = null },
             onPlayNextClick = onPlayNextClick,
@@ -102,7 +129,8 @@ fun AccountScreen(
             onCreatePlaylist = { playlistName ->
                 accountViewModel.createPlaylist(playlistName)
             },
-            playlists = uiState.playlists
+            playlists = uiState.playlists,
+            onDelete = { showDeleteSong = true }
         )
         Text(
             text = "Account",
@@ -271,3 +299,4 @@ fun AccountScreen(
         Spacer(Modifier.height(16.dp))
     }
 }
+

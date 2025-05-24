@@ -54,7 +54,7 @@ class SearchViewModel(
                     _uiState.value = _uiState.value.copy(listSong = response.body()?.data ?: emptyList())
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }
-                val res = playlistRepository.findAll();
+                val res = playlistRepository.findAll(true);
                 if (res.isSuccessful) {
                     _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
                 }
@@ -80,7 +80,7 @@ class SearchViewModel(
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             playlistRepository.createPlaylist(name)
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }

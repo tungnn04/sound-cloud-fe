@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.app.MusicApplication
 import com.example.app.data.FavoriteRepository
 import com.example.app.data.PlaylistRepository
+import com.example.app.data.SongRepository
 import com.example.app.data.ThemeSetting
 import com.example.app.data.UserPreferencesRepository
 import com.example.app.data.UserRepository
@@ -24,6 +25,7 @@ class AccountViewModel(
     private val userRepository: UserRepository,
     private val playlistRepository: PlaylistRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val songRepository: SongRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
     private val currentThemeSetting = runBlocking { userPreferencesRepository.themeSetting.first() }
@@ -39,7 +41,7 @@ class AccountViewModel(
         if (songsResponse.isSuccessful) {
             _uiState.value = _uiState.value.copy(songs = songsResponse.body()?.data ?: emptyList())
         }
-        val res = playlistRepository.findAll();
+        val res = playlistRepository.findAll(true);
         if (res.isSuccessful) {
             _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
         }
@@ -51,10 +53,17 @@ class AccountViewModel(
         }
     }
 
+    suspend fun deleteSong(songId: Int) {
+        val response = songRepository.delete(songId)
+        if (response.isSuccessful) {
+            fetchData()
+        }
+    }
+
     fun createPlaylist(name: String) {
         viewModelScope.launch {
             playlistRepository.createPlaylist(name)
-            val res = playlistRepository.findAll();
+            val res = playlistRepository.findAll(true);
             if (res.isSuccessful) {
                 _uiState.value = _uiState.value.copy(playlists = res.body()?.data ?: emptyList())
             }
@@ -86,8 +95,9 @@ class AccountViewModel(
                 val userRepository = application.container.userRepository
                 val playlistRepository = application.container.playlistRepository
                 val favoriteRepository = application.container.favoriteRepository
+                val songRepository = application.container.songRepository
                 val userPreferencesRepository = application.container.userPreferencesRepository
-                AccountViewModel(userRepository, playlistRepository, favoriteRepository, userPreferencesRepository)
+                AccountViewModel(userRepository, playlistRepository, favoriteRepository, songRepository, userPreferencesRepository)
             }
         }
     }

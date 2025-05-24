@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -114,7 +115,7 @@ fun UploadSongScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             TopBar(
-                title = "Tải lên bài hát",
+                title = "Upload Song",
                 onNavigationClick = { navController.navigateUp() },
                 onActionClick = { },
                 navigationIcon = R.drawable.ic_back,
@@ -130,7 +131,7 @@ fun UploadSongScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AppTextField(
-                    label = "Tiêu đề bài hát",
+                    label = "Song title",
                     value = uiState.title,
                     onValueChange = { uploadSongViewModel.updateTitle(it) },
                     modifier = Modifier
@@ -171,7 +172,7 @@ fun UploadSongScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AppButton(
-                    text = if (uiState.isLoading) "Đang tải lên..." else "Tải lên",
+                    text = if (uiState.isLoading) "Uploading ..." else "Upload",
                     onClick = { uploadSongViewModel.uploadSong() },
                     style = ButtonStyle.PRIMARY,
                     modifier = Modifier.fillMaxWidth()
@@ -193,7 +194,7 @@ fun ArtistDropdown(
     val selectedArtist = artists.find { it.id == selectedArtistId }
 
     Text(
-        text = "Nghệ sĩ",
+        text = "Artist",
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground
     )
@@ -209,7 +210,7 @@ fun ArtistDropdown(
             readOnly = true,
             placeholder = {
                 Text(
-                    "Chọn nghệ sĩ",
+                    "Choose artist",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -222,8 +223,6 @@ fun ArtistDropdown(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.outline,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
-//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
                 cursorColor = MaterialTheme.colorScheme.onBackground,
                 focusedTextColor = MaterialTheme.colorScheme.onBackground,
                 unfocusedTextColor = MaterialTheme.colorScheme.onBackground
@@ -236,7 +235,7 @@ fun ArtistDropdown(
             modifier = Modifier.exposedDropdownSize()
         ) {
             DropdownMenuItem(
-                text = { Text("Không có") },
+                text = { Text("None") },
                 onClick = {
                     onArtistSelected(null)
                     expanded = false
@@ -283,7 +282,7 @@ fun AlbumDropdown(
             readOnly = true,
             placeholder = {
                 Text(
-                    "Chọn album",
+                    "Choose album",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -310,7 +309,7 @@ fun AlbumDropdown(
             modifier = Modifier.exposedDropdownSize()
         ) {
             DropdownMenuItem(
-                text = { Text("Không có") },
+                text = { Text("None") },
                 onClick = {
                     onAlbumSelected(null)
                     expanded = false
@@ -347,7 +346,7 @@ fun CategoryDropdown(
     )
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { expanded = !expanded },
         modifier = Modifier.fillMaxWidth()
     ) {
 
@@ -357,7 +356,7 @@ fun CategoryDropdown(
             readOnly = true,
             placeholder = {
                 Text(
-                    "Chọn danh mục",
+                    "Choose category",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -370,8 +369,6 @@ fun CategoryDropdown(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.outline,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-//                focusedContainerColor = MaterialTheme.colorScheme.onBackground,
-//                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground,
                 cursorColor = MaterialTheme.colorScheme.onBackground,
                 focusedTextColor = MaterialTheme.colorScheme.onBackground,
                 unfocusedTextColor = MaterialTheme.colorScheme.onBackground
@@ -381,10 +378,15 @@ fun CategoryDropdown(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.exposedDropdownSize()
+            modifier = Modifier
+                .exposedDropdownSize(false)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+
         ) {
             DropdownMenuItem(
-                text = { Text("Không có") },
+                text = {
+                    Text("None")
+                },
                 onClick = {
                     onCategorySelected(null)
                     expanded = false
@@ -393,7 +395,7 @@ fun CategoryDropdown(
 
             categories.forEach { category ->
                 DropdownMenuItem(
-                    text = { Text(category.name) },
+                    text = {Text(category.name) },
                     onClick = {
                         onCategorySelected(category.id)
                         expanded = false
@@ -401,6 +403,7 @@ fun CategoryDropdown(
                 )
             }
         }
+
     }
 }
 
@@ -411,7 +414,7 @@ fun AudioFilePicker(
 ) {
     Column {
         Text(
-            text = "File âm thanh",
+            text = "Audio file",
             style = MaterialTheme.typography.bodyLarge,
         )
 
@@ -437,7 +440,7 @@ fun AudioFilePicker(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = audioUri?.path?.substringAfterLast("/") ?: "Chọn file âm thanh",
+                    text = audioUri?.path?.substringAfterLast("/") ?: "Choose audio file",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -453,7 +456,7 @@ fun CoverImagePicker(
 ) {
     Column {
         Text(
-            text = "Ảnh bìa",
+            text = "Cover image",
             style = MaterialTheme.typography.bodyLarge,
         )
 
@@ -489,7 +492,7 @@ fun CoverImagePicker(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Nhấn để chọn ảnh bìa",
+                        text = "Choose cover image",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -498,3 +501,4 @@ fun CoverImagePicker(
         }
     }
 }
+

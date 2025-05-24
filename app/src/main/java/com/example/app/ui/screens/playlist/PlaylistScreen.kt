@@ -1,6 +1,5 @@
 package com.example.app.ui.screens.playlist
 
-import android.view.RoundedCorner
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,28 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -83,10 +66,11 @@ fun PlaylistScreen(
     var showEditPlaylist by remember { mutableStateOf(false)}
     var showPlaylistOption by remember { mutableStateOf(false) }
     var playListClick by remember { mutableStateOf<PlayList?>(null) }
+    var isDesc by remember { mutableStateOf(true) }
 
-    LaunchedEffect(true) {
+    LaunchedEffect(isDesc) {
         try {
-            playlistViewModel.fetchData()
+            playlistViewModel.fetchData(isDesc)
         } catch (e: Exception) {
             Toast.makeText(
                 context,
@@ -100,7 +84,8 @@ fun PlaylistScreen(
         playListClick?.let { playlist ->
             coroutineScope.launch {
                 try {
-                    playlistViewModel.deletePlaylist(playlist.id)
+                    playlistViewModel.deletePlaylist(playlist.id, isDesc)
+                    playListClick = null
                     FancyToast.makeText(context, "Delete playlist successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
                 } catch (e: Exception) {
                     Toast.makeText(
@@ -117,8 +102,8 @@ fun PlaylistScreen(
         playListClick?.let { playlist ->
             coroutineScope.launch {
                 try {
-                    playlistViewModel.updatePlaylist(playlist.id,it)
-                    Toast.makeText(context, "Update playlist name successfully", Toast.LENGTH_SHORT).show()
+                    playlistViewModel.updatePlaylist(playlist.id,it, isDesc)
+                    FancyToast.makeText(context, "Update playlist name successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show()
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
@@ -152,7 +137,7 @@ fun PlaylistScreen(
             showCreatePlaylist = showCreatePlaylist,
             onDismissClick = { showCreatePlaylist = false },
             onCreatePlaylist = {
-                playlistViewModel.createPlaylist(it)
+                playlistViewModel.createPlaylist(it, isDesc)
             },
             onDone = {
                 showCreatePlaylist = false
@@ -203,12 +188,17 @@ fun PlaylistScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+            Row(modifier = Modifier.clickable { isDesc = !isDesc }, verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Recently Added",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Icon(
-                    painterResource(id = R.drawable.ic_swap),
+                    painterResource(id = if (isDesc) R.drawable.ic_desc else R.drawable.ic_asc),
                     contentDescription = "Sort",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(20.dp)
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(30.dp).padding(start = 8.dp)
                 )
             }
         }
@@ -228,7 +218,7 @@ fun PlaylistScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = "Add New Playlist",
                         style = MaterialTheme.typography.headlineSmall,

@@ -4,15 +4,10 @@ import com.example.app.model.ApiResponse
 import com.example.app.model.PlayList
 import com.example.app.model.PlaylistRequest
 import com.example.app.network.PlaylistApiService
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.io.File
 
 interface PlaylistRepository {
-    suspend fun findAll(): Response<ApiResponse<List<PlayList>>>
+    suspend fun findAll(sortDesc: Boolean): Response<ApiResponse<List<PlayList>>>
     suspend fun detail(id: Int): Response<ApiResponse<PlayList>>
     suspend fun createPlaylist(
         name: String
@@ -35,8 +30,8 @@ interface PlaylistRepository {
 class PlaylistRepositoryImpl(
     private val playlistApiService: PlaylistApiService
 ): PlaylistRepository {
-    override suspend fun findAll(): Response<ApiResponse<List<PlayList>>> =
-        playlistApiService.findAll()
+    override suspend fun findAll(sortDesc: Boolean): Response<ApiResponse<List<PlayList>>> =
+        playlistApiService.findAll(sortDesc)
 
     override suspend fun detail(id: Int): Response<ApiResponse<PlayList>> =
         playlistApiService.detail(id)
