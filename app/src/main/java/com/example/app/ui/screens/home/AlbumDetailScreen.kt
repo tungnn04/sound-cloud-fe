@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -102,8 +103,7 @@ fun AlbumDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
@@ -154,7 +154,7 @@ fun AlbumDetailScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
                 Spacer(modifier = Modifier.height(16.dp))
             }
             if (uiState.album?.songs?.isNotEmpty() == true){
@@ -164,7 +164,8 @@ fun AlbumDetailScreen(
                         onMoreOptionClick = { songClick = it },
                         onPlayClick = onPlayClick,
                         currentSong = currentSong,
-                        isPlaying = isPlaying
+                        isPlaying = isPlaying,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

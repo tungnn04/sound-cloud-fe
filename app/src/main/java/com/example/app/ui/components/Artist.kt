@@ -37,10 +37,11 @@ import com.example.app.ui.MusicScreen
 @Composable
 fun ArtistItem(
     artist: Artist,
+    modifier: Modifier = Modifier,
     navController: NavController
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -101,7 +102,7 @@ fun ListArtist(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         items(listArtist.size) { index ->
-            ArtistItem(artist = listArtist[index], navController = navController)
+            ArtistItem(artist = listArtist[index], navController = navController, modifier = Modifier.padding(start = 16.dp))
         }
     }
 }

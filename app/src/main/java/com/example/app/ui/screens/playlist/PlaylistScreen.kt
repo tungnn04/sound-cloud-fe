@@ -118,8 +118,7 @@ fun PlaylistScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -173,13 +172,13 @@ fun PlaylistScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp, start = 16.dp)
                 .fillMaxWidth()
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         ) {
             val numPlaylist = uiState.playlists.size
             val numPlaylistText = if (numPlaylist > 1) "$numPlaylist playlists" else "$numPlaylist playlist"
@@ -202,11 +201,11 @@ fun PlaylistScreen(
                 )
             }
         }
-        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+        HorizontalDivider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
         LazyColumn {
             item {
                 Row(
-                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { showCreatePlaylist = true },
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { showCreatePlaylist = true }.padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -232,7 +231,8 @@ fun PlaylistScreen(
                         onMoreOptionClick = {
                             showPlaylistOption = true
                             playListClick = it
-                        }
+                        },
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -245,10 +245,11 @@ fun PlaylistScreen(
 private fun PlayListItem(
     playList: PlayList,
     onMoreOptionClick: (PlayList) -> Unit,
-    navController: NavController
+    navController: NavController,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { navController.navigate("${MusicScreen.PLAYLIST_DETAIL.name}/${playList.id}") },
+        modifier = modifier.fillMaxWidth().clickable { navController.navigate("${MusicScreen.PLAYLIST_DETAIL.name}/${playList.id}") },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -268,7 +269,7 @@ private fun PlayListItem(
                     .clip(RoundedCornerShape(12.dp))
             )
             Column(
-                modifier = Modifier.padding(start = 16.dp),
+                modifier = Modifier.padding(start = 8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(

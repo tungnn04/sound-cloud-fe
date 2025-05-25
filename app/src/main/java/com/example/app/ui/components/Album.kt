@@ -48,12 +48,13 @@ fun AlbumItem(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 8.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(12.dp))
                 .clickable { navController.navigate("${MusicScreen.ALBUM_DETAIL.name}/${album.id}") }
         )
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -61,7 +62,7 @@ fun AlbumItem(
                 text = album.title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(start = 16.dp)
             )
             IconButton(
                 onClick = {}
@@ -76,12 +77,13 @@ fun AlbumItem(
         }
         Row(
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.fillMaxWidth().padding(start = 12.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "${album.artistName} | ${album.releaseYear}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 16.dp)
             )
         }
         val numSong = album.songs?.size ?: 0
@@ -90,7 +92,7 @@ fun AlbumItem(
             text = numSongText,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth().padding(start = 12.dp)
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
         )
     }
 }
@@ -103,7 +105,8 @@ fun ListAlbum(
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier
+            .padding(horizontal = 8.dp),
     ) {
         items(listAlbum.size) { index ->
             AlbumItem(album = listAlbum[index], navController = navController)

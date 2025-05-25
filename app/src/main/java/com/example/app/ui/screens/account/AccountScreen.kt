@@ -104,7 +104,6 @@ fun AccountScreen(
             .fillMaxSize()
             .verticalScroll(scrollState)
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp)
     ) {
         ConfirmationPrompt(
             showConfirmationPrompt = showDeleteSong,
@@ -136,11 +135,12 @@ fun AccountScreen(
             text = "Account",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp)
             )
         Spacer(Modifier.height(16.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -172,7 +172,7 @@ fun AccountScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = 24.dp).padding(start = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -193,110 +193,114 @@ fun AccountScreen(
         uiState.songs.forEach { song ->
             Spacer(modifier = Modifier.height(8.dp))
             SongItem(song = song, onPlayClick = onPlayClick, onMoreOptionClick = { songClick = it },
-                currentSong = currentSong, isPlaying = isPlaying)
+                currentSong = currentSong, isPlaying = isPlaying, modifier = Modifier.padding(start = 24.dp))
         }
         Spacer(Modifier.height(24.dp))
-        Text(
-            text = "Setting",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = {navController.navigate(MusicScreen.EDIT_PROFILE.name) })
-                .padding(horizontal = 8.dp ,vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Icon(
-                painterResource(id = R.drawable.ic_edit),
-                contentDescription = "Edit profile",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
             Text(
-                text = "Edit Profile",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                text = "Setting",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = {navController.navigate(MusicScreen.CHANGE_PASSWORD.name) })
-                .padding(horizontal = 8.dp ,vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Icon(
-                painterResource(id = R.drawable.ic_key),
-                contentDescription = "Change password",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Change password",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = {navController.navigate(MusicScreen.EDIT_PROFILE.name) })
+                    .padding(horizontal = 8.dp ,vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_edit),
+                    contentDescription = "Edit profile",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Edit Profile",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = {navController.navigate(MusicScreen.DARK_MODE.name) })
-                .padding(horizontal = 8.dp ,vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Icon(
-                painterResource(id = R.drawable.ic_dark_mode),
-                contentDescription = "Change dark theme",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Dark theme",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(Modifier.weight(1f))
-            Text(
-                text = uiState.currentThemeSetting.name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(end = 16.dp)
-            )
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = {navController.navigate(MusicScreen.CHANGE_PASSWORD.name) })
+                    .padding(horizontal = 8.dp ,vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_key),
+                    contentDescription = "Change password",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Change password",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = {
-                    accountViewModel.logout()
-                    stopService()
-                    navController.navigate(MusicScreen.LOGIN.name)
-                })
-                .padding(horizontal = 8.dp ,vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Icon(
-                painterResource(id = R.drawable.ic_logout),
-                contentDescription = "Logout",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "Logout",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = {navController.navigate(MusicScreen.DARK_MODE.name) })
+                    .padding(horizontal = 8.dp ,vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_dark_mode),
+                    contentDescription = "Change dark theme",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Dark theme",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = uiState.currentThemeSetting.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = {
+                        accountViewModel.logout()
+                        stopService()
+                        navController.navigate(MusicScreen.LOGIN.name)
+                    })
+                    .padding(horizontal = 8.dp ,vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_logout),
+                    contentDescription = "Logout",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Logout",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            Spacer(Modifier.height(16.dp))
         }
-        Spacer(Modifier.height(16.dp))
     }
 }
 

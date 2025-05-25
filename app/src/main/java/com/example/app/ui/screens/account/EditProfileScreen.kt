@@ -37,6 +37,7 @@ import com.example.app.ui.components.AppTextField
 import com.example.app.ui.components.ButtonStyle
 import com.example.app.ui.components.TopBar
 import com.shashank.sony.fancytoastlib.FancyToast
+import kotlinx.coroutines.delay
 
 @Composable
 fun EditProfileScreen(
@@ -45,10 +46,17 @@ fun EditProfileScreen(
 ) {
     val uiState by editProfileViewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val message by editProfileViewModel.message.collectAsState()
-    LaunchedEffect(message) {
-        message?.let {
-            FancyToast.makeText(context, it, FancyToast.LENGTH_LONG, FancyToast.SUCCESS, false).show()
+    val uploadSuccess by editProfileViewModel.uploadSuccess.collectAsState()
+    LaunchedEffect(uploadSuccess) {
+        if (uploadSuccess) {
+            FancyToast.makeText(
+                context,
+                "Profile updated successfully",
+                FancyToast.LENGTH_SHORT,
+                FancyToast.SUCCESS,
+                false
+            ).show()
+            navController.navigateUp()
         }
     }
 
@@ -138,15 +146,11 @@ fun EditProfileScreen(
                     text = if (uiState.isLoading) "Updating ..." else "Update",
                     onClick = {
                         editProfileViewModel.updateProfile()
-                        navController.navigateUp()
                     },
                     style = ButtonStyle.PRIMARY,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
-
-
         }
     }
 }

@@ -26,6 +26,9 @@ class EditProfileViewModel(
     private val _message = MutableStateFlow<String?>(null)
     val message = _message.asStateFlow()
 
+    private val _uploadSuccess = MutableStateFlow(false)
+    val uploadSuccess = _uploadSuccess.asStateFlow()
+
     init {
         viewModelScope.launch {
             try {
@@ -62,22 +65,19 @@ class EditProfileViewModel(
                     avatarImage = uiState.value.avatarImage
                 )
                 if (response.isSuccessful) {
-                    _uiState.value = uiState.value.copy(
-                        isLoading = false
-                    )
+                    _uploadSuccess.value = true
+                    _message.value = "Update profile successfully"
                 } else {
-                    _uiState.value = uiState.value.copy(
-                        isLoading = false,
-                    )
+                    _message.value = response.body()?.message ?: "Failed to update profile"
                 }
-                _message.value = response.body()?.message
                 Log.d("EditProfileViewModel", "updateProfile: ${response.body()}")
             } catch (e: Exception) {
+                _message.value = e.message
+                Log.e("EditProfileViewModel", "Error updating profile", e)
+            } finally {
                 _uiState.value = uiState.value.copy(
                     isLoading = false,
                 )
-                _message.value = e.message
-                Log.e("EditProfileViewModel", "Error updating profile", e)
             }
         }
     }

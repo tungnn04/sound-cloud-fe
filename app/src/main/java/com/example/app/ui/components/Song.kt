@@ -103,7 +103,7 @@ fun ListSong(
           verticalArrangement = Arrangement.spacedBy(8.dp)
      ) {
           items(listSong.size) { index ->
-               SongItem(listSong[index], onPlayClick = onPlayClick, onMoreOptionClick = onMoreOptionClick, currentSong = currentSong, isPlaying = isPlaying )
+               SongItem(listSong[index], onPlayClick = onPlayClick, onMoreOptionClick = onMoreOptionClick, currentSong = currentSong, isPlaying = isPlaying, modifier = Modifier.padding(start = 16.dp) )
           }
      }
 }

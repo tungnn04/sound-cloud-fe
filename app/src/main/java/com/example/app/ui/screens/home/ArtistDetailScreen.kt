@@ -103,8 +103,7 @@ fun ArtistDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
@@ -157,7 +156,7 @@ fun ArtistDetailScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
                 Spacer(modifier = Modifier.height(16.dp))
             }
             if (uiState.artist?.songs?.isNotEmpty() == true){
@@ -167,7 +166,8 @@ fun ArtistDetailScreen(
                         onMoreOptionClick = { songClick = it },
                         onPlayClick = onPlayClick,
                         currentSong = currentSong,
-                        isPlaying = isPlaying
+                        isPlaying = isPlaying,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

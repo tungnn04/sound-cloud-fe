@@ -125,10 +125,6 @@ class UploadSongViewModel(
                     _errorMessage.value = "Vui lòng chọn file âm thanh và ảnh bìa"
                     return@launch
                 }
-
-                Log.d("UploadSongViewModel", "Cover image: ${coverImage.first.absolutePath}")
-                Log.d("UploadSongViewModel", "Audio file: ${audioFile.first.absolutePath}")
-
                 val response = songRepository.create(
                     title = currentState.title,
                     artistId = currentState.artistId,

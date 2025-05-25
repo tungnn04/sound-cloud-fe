@@ -118,7 +118,7 @@ fun CategoryScreen(
                         onPlayClick = onPlayClick,
                         currentSong = currentSong,
                         isPlaying = isPlaying,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

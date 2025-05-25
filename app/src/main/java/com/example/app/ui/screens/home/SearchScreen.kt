@@ -179,7 +179,7 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(vertical = 8.dp)
                 .pointerInput(Unit) {
                     detectTapGestures {
                         focusManager.clearFocus()
@@ -203,7 +203,7 @@ fun SearchScreen(
             )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth().padding(horizontal = 16.dp),
             ) {
                 CategoryButton(
                     text = "Songs",
@@ -250,7 +250,7 @@ fun SearchScreen(
                             songClick = it
                         },
                         currentSong = currentSong,
-                        isPlaying = isPlaying
+                        isPlaying = isPlaying,
                     )
                 }
             }

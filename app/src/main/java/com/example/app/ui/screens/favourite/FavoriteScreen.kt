@@ -85,8 +85,7 @@ fun FavoriteScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -124,7 +123,7 @@ fun FavoriteScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding(vertical = 16.dp)
+            modifier = Modifier.padding(top = 16.dp, start = 16.dp)
                 .fillMaxWidth()
         )
         LazyColumn {
@@ -133,7 +132,6 @@ fun FavoriteScreen(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
                 ) {
                     AppButton(
                         text = "Shuffle",
@@ -157,7 +155,7 @@ fun FavoriteScreen(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 ) {
                     val numSong = uiState.songs.size
                     val numFavoriteText = if (numSong > 1) "$numSong favorites" else "$numSong favorite"
@@ -179,10 +177,13 @@ fun FavoriteScreen(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
             item {
-                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
             }
             if (uiState.songs.isNotEmpty()){
                 items(uiState.songs.size) { index ->
@@ -191,7 +192,8 @@ fun FavoriteScreen(
                         onMoreOptionClick = { songClick = it },
                         onPlayClick = onPlayClick,
                         currentSong = currentSong,
-                        isPlaying = isPlaying
+                        isPlaying = isPlaying,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
