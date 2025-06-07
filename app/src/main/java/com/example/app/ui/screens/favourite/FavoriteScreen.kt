@@ -70,7 +70,7 @@ fun FavoriteScreen(
     var songClick by remember { mutableStateOf<Song?>(null) }
     var isDesc by remember { mutableStateOf(true) }
 
-    LaunchedEffect(true) {
+    LaunchedEffect(isDesc) {
         try {
             favoriteViewModel.fetchData(isDesc)
         } catch (e: Exception) {

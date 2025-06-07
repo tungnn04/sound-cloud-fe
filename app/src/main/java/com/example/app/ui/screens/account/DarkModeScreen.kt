@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.app.R
 import com.example.app.data.ThemeSetting
+import com.example.app.ui.MusicScreen
 import com.example.app.ui.components.TopBar
 
 @Composable
@@ -39,7 +40,7 @@ fun DarkModeScreen(
     ) {
         TopBar(
             title = "Dark theme",
-            onNavigationClick = { navController.navigateUp() },
+            onNavigationClick = { navController.navigate(MusicScreen.ACCOUNT.name) },
             onActionClick = { },
             navigationIcon = R.drawable.ic_back,
             actionIcon = null,

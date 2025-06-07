@@ -221,6 +221,7 @@ fun ForgotPasswordScreen(
                     AppTextField(
                         label = "Password",
                         value = uiState.password,
+                        isPassword = true,
                         onValueChange = { forgotPwViewModel.setPassword(it) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -228,6 +229,7 @@ fun ForgotPasswordScreen(
                     AppTextField(
                         label = "Confirm Password",
                         value = uiState.confirmPassword,
+                        isPassword = true,
                         onValueChange = { forgotPwViewModel.setConfirmPassword(it) },
                         modifier = Modifier.fillMaxWidth()
                     )
